@@ -3,8 +3,7 @@ local aabb = dofile(minetest.get_modpath("ggraffiti") .. "/aabb.lua")
 dofile(minetest.get_modpath("ggraffiti") .. "/canvas.lua")
 _ = modlib.minetest
 
-local SPRAY_LENGTH = 60
-local SPRAY_INTERVAL = 0.0045
+local SPRAY_DURATION = 60
 local MAX_SPRAY_DISTANCE = 4
 
 local TRANSPARENT = "#00000000"
@@ -41,6 +40,11 @@ local function spraycast(player, pos, dir, def)
     if not pthing or pthing.type ~= "node" then return end
 
     local node_pos = pthing.under
+    if minetest.is_protected(node_pos, player:get_player_name()) then
+        minetest.record_protection_violation(node_pos, player:get_player_name())
+        return
+    end
+
     -- There is no such function. :(
     -- local raw_box = minetest.get_node_selection_boxes(pthing.under)[pthing.box_id]
     local raw_box = modlib.minetest.get_node_selectionboxes(pthing.under)[pthing.box_id]
@@ -112,16 +116,6 @@ local function spraycast(player, pos, dir, def)
 end
 
 local function spray_can_on_use(item, player)
-    -- Related stuff:
-    -- Server::handleCommand_PlayerPos
-    -- (https://github.com/minetest/minetest/blob/5.6.1/src/network/serverpackethandler.cpp#L512)
-    -- Server::handleCommand_Interact
-    -- (https://github.com/minetest/minetest/blob/5.6.1/src/network/serverpackethandler.cpp#L916)
-    -- Server::process_PlayerPos
-    -- (https://github.com/minetest/minetest/blob/5.6.1/src/network/serverpackethandler.cpp#L459)
-    -- If no malicious / buggy client involved:
-    -- assert(player:get_player_control().dig)
-
     local pos = player:get_pos()
     pos.y = pos.y + player:get_properties().eye_height
     local dir = player:get_look_dir()
@@ -197,19 +191,28 @@ minetest.register_craft({
     output = "default:steel_ingot 2",
 })
 
+-- Clients send the position of their player every 0.1 seconds.
+-- https://github.com/minetest/minetest/blob/5.6.1/src/client/client.h#L563
+-- https://github.com/minetest/minetest/blob/5.6.1/src/client/client.cpp#L528
+
+local STEP_INTERVAL = 0.1
+local NUM_STEPS = 5
+
+local dtime_accu = 0
+
 local function lerp(a, b, t)
     return a + (b - a) * t
 end
 
 local function wear_out(item)
-    item:add_wear_by_uses(SPRAY_LENGTH / SPRAY_INTERVAL)
+    item:add_wear_by_uses(SPRAY_DURATION / STEP_INTERVAL * NUM_STEPS)
     if item:is_empty() then
         return ItemStack("ggraffiti:spray_can_empty"), false
     end
     return item, true
 end
 
-minetest.register_globalstep(function(dtime)
+local function spray_step()
     for _, player in ipairs(minetest.get_connected_players()) do
         local player_name = player:get_player_name()
 
@@ -225,8 +228,7 @@ minetest.register_globalstep(function(dtime)
                 local now_dir = player:get_look_dir()
 
                 if last then
-                    local n_steps = math.round(dtime / SPRAY_INTERVAL)
-
+                    local n_steps = NUM_STEPS
                     for step_n = 1, n_steps do
                         local alive
                         item, alive = wear_out(item)
@@ -237,7 +239,10 @@ minetest.register_globalstep(function(dtime)
                     end
                     player:set_wielded_item(item)
 
-                    if not now_pos:equals(last.pos) or not now_dir:equals(last.dir) then
+                    if now_pos:equals(last.pos) and now_dir:equals(last.dir) then
+                        -- The player hasn't moved, but the world may have changed.
+                        spraycast(player, now_pos, now_dir, def._ggraffiti_spray_can)
+                    else
                         for step_n = 1, n_steps do
                             local combine_lerp = function(a, b)
                                 return lerp(a, b, step_n / n_steps)
@@ -257,5 +262,13 @@ minetest.register_globalstep(function(dtime)
         else
             player_lasts[player_name] = nil
         end
+    end
+end
+
+minetest.register_globalstep(function(dtime)
+    dtime_accu = dtime_accu + dtime
+    if dtime_accu >= STEP_INTERVAL then
+        dtime_accu = dtime_accu % STEP_INTERVAL
+        spray_step()
     end
 end)
