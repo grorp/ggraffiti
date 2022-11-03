@@ -1,9 +1,24 @@
+if not modlib.minetest.get_node_selectionboxes then
+    error(
+        '\n' ..
+        '────────────────────────────────────────────────────────────────────────────────────────────────────\n' ..
+        'You have an outdated version of the "Modding Library" mod installed. Please go to the "Content" tab and update the "Modding Library" mod.\n' ..
+        '────────────────────────────────────────────────────────────────────────────────────────────────────\n',
+        2
+    )
+end
+
 local t = minetest.get_translator("ggraffiti")
 local aabb = dofile(minetest.get_modpath("ggraffiti") .. "/aabb.lua")
 dofile(minetest.get_modpath("ggraffiti") .. "/canvas.lua")
-_ = modlib.minetest
 
-local SPRAY_DURATION = 60
+local SPRAY_DURATION = 240
+-- Clients send the position of their player every 0.1 seconds.
+-- https://github.com/minetest/minetest/blob/5.6.1/src/client/client.h#L563
+-- https://github.com/minetest/minetest/blob/5.6.1/src/client/client.cpp#L528
+local SPRAY_STEP_INTERVAL = 0.1
+local NUM_SPRAY_STEPS = 5
+
 local MAX_SPRAY_DISTANCE = 4
 
 local TRANSPARENT = "#00000000"
@@ -115,6 +130,14 @@ local function spraycast(player, pos, dir, def)
     end
 end
 
+local function wear_out(item)
+    item:add_wear_by_uses(SPRAY_DURATION / SPRAY_STEP_INTERVAL * NUM_SPRAY_STEPS)
+    if item:is_empty() then
+        return ItemStack("ggraffiti:spray_can_empty"), false
+    end
+    return item, true
+end
+
 local function spray_can_on_use(item, player)
     local pos = player:get_pos()
     pos.y = pos.y + player:get_properties().eye_height
@@ -122,9 +145,10 @@ local function spray_can_on_use(item, player)
 
     spraycast(player, pos, dir, item:get_definition()._ggraffiti_spray_can)
     player_lasts[player:get_player_name()] = { pos = pos, dir = dir }
+    return wear_out(item)
 end
 
-minetest.register_tool("ggraffiti:spray_can_empty", {
+minetest.register_craftitem("ggraffiti:spray_can_empty", { -- stackable
     description = t("Empty Spray Can"),
     inventory_image = "ggraffiti_spray_can.png",
 
@@ -163,6 +187,16 @@ for _, dye in ipairs(dye.dyes) do
     })
 end
 
+minetest.register_craftitem("ggraffiti:mushroom_red_extract", {
+    description = t("Red Mushroom Extract"),
+    inventory_image = "ggraffiti_mushroom_red_extract.png",
+})
+
+minetest.register_craft({
+    recipe = {{"flowers:mushroom_red"}},
+    output = "ggraffiti:mushroom_red_extract 4",
+})
+
 minetest.register_tool("ggraffiti:spray_can_anti", {
     description = t("Anti-Graffiti Spray Can"),
     inventory_image = "ggraffiti_spray_can_anti.png",
@@ -179,7 +213,7 @@ minetest.register_tool("ggraffiti:spray_can_anti", {
 minetest.register_craft({
     recipe = {
         {"default:steel_ingot"},
-        {"flowers:mushroom_red"},
+        {"ggraffiti:mushroom_red_extract"},
         {"default:steel_ingot"},
     },
     output = "ggraffiti:spray_can_anti",
@@ -191,25 +225,8 @@ minetest.register_craft({
     output = "default:steel_ingot 2",
 })
 
--- Clients send the position of their player every 0.1 seconds.
--- https://github.com/minetest/minetest/blob/5.6.1/src/client/client.h#L563
--- https://github.com/minetest/minetest/blob/5.6.1/src/client/client.cpp#L528
-
-local STEP_INTERVAL = 0.1
-local NUM_STEPS = 5
-
-local dtime_accu = 0
-
 local function lerp(a, b, t)
     return a + (b - a) * t
-end
-
-local function wear_out(item)
-    item:add_wear_by_uses(SPRAY_DURATION / STEP_INTERVAL * NUM_STEPS)
-    if item:is_empty() then
-        return ItemStack("ggraffiti:spray_can_empty"), false
-    end
-    return item, true
 end
 
 local function spray_step()
@@ -228,7 +245,7 @@ local function spray_step()
                 local now_dir = player:get_look_dir()
 
                 if last then
-                    local n_steps = NUM_STEPS
+                    local n_steps = NUM_SPRAY_STEPS
                     for step_n = 1, n_steps do
                         local alive
                         item, alive = wear_out(item)
@@ -265,10 +282,12 @@ local function spray_step()
     end
 end
 
+local dtime_accu = 0
+
 minetest.register_globalstep(function(dtime)
     dtime_accu = dtime_accu + dtime
-    if dtime_accu >= STEP_INTERVAL then
-        dtime_accu = dtime_accu % STEP_INTERVAL
+    if dtime_accu >= SPRAY_STEP_INTERVAL then
+        dtime_accu = dtime_accu % SPRAY_STEP_INTERVAL
         spray_step()
     end
 end)
