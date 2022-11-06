@@ -21,3 +21,9 @@ Press and hold the dig button (the one you normally use to remove blocks) to pai
 ![](./docpics/recipe_anti_spray_can.png)
 
 A spray can that removes graffiti. Essentially an eraser.
+
+## License
+
+© 2022 Gregor Parzefall
+
+Source code (everything except image and audio files) available under the [GNU GPL v3.0](https://www.gnu.org/licenses/gpl-3.0.html) or any later version, media (image and audio files) available under the [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
