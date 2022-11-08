@@ -130,22 +130,29 @@ local function spraycast(player, pos, dir, def)
     end
 end
 
-local function wear_out(item)
-    item:add_wear_by_uses(SPRAY_DURATION / SPRAY_STEP_INTERVAL * NUM_SPRAY_STEPS)
-    if item:is_empty() then
-        return ItemStack("ggraffiti:spray_can_empty"), false
+local function wear_out(item, uses)
+    for i = 1, uses do
+        item:add_wear_by_uses(SPRAY_DURATION / SPRAY_STEP_INTERVAL * NUM_SPRAY_STEPS)
+        if item:is_empty() then
+            return ItemStack("ggraffiti:spray_can_empty"), i
+        end
     end
-    return item, true
+    return item, uses
 end
 
 local function spray_can_on_use(item, player)
+    local player_name = player:get_player_name()
+
     local pos = player:get_pos()
     pos.y = pos.y + player:get_properties().eye_height
     local dir = player:get_look_dir()
-
     spraycast(player, pos, dir, item:get_definition()._ggraffiti_spray_can)
-    player_lasts[player:get_player_name()] = { pos = pos, dir = dir }
-    return wear_out(item)
+    player_lasts[player_name] = {pos = pos, dir = dir}
+
+    if not minetest.is_creative_enabled(player_name) then
+        local item, _ = wear_out(item, 1)
+        return item
+    end
 end
 
 minetest.register_craftitem("ggraffiti:spray_can_empty", { -- stackable
@@ -246,15 +253,10 @@ local function spray_step()
 
                 if last then
                     local n_steps = NUM_SPRAY_STEPS
-                    for step_n = 1, n_steps do
-                        local alive
-                        item, alive = wear_out(item)
-                        if not alive then
-                            n_steps = step_n
-                            break
-                        end
+                    if not minetest.is_creative_enabled(player_name) then
+                        item, n_steps = wear_out(item, n_steps)
+                        player:set_wielded_item(item)
                     end
-                    player:set_wielded_item(item)
 
                     if now_pos:equals(last.pos) and now_dir:equals(last.dir) then
                         -- The player hasn't moved, but the world may have changed.
@@ -272,7 +274,7 @@ local function spray_step()
                     end
                 end
 
-                player_lasts[player_name] = { pos = now_pos, dir = now_dir }
+                player_lasts[player_name] = {pos = now_pos, dir = now_dir}
             else
                 player_lasts[player_name] = nil
             end
