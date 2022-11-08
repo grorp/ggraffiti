@@ -1,6 +1,6 @@
 # GGraffiti
 
-This Minetest mod adds graffiti that lets you paint whatever you want on any node you want.
+This Minetest mod adds graffiti that lets you paint whatever you want on any node you want. It requires at least Minetest 5.6.0.
 
 <img src="./docpics/screenshot_cdb.png" style="width: 512px;" />
 
