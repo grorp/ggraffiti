@@ -9,6 +9,19 @@ local CanvasEntity = {
     },
 }
 
+local function validate_staticdata(data)
+    return
+        type(data) == "table" and
+        type(data.size) == "table" and
+        type(data.size.x) == "number" and
+        type(data.size.y) == "number" and
+        type(data.bitmap_size) == "table" and
+        type(data.bitmap_size.x) == "number" and
+        type(data.bitmap_size.y) == "number" and
+        type(data.bitmap) == "table" and
+        #data.bitmap == data.bitmap_size.x * data.bitmap_size.y
+end
+
 function CanvasEntity:on_activate(staticdata)
     self.object:set_armor_groups({immortal = 1})
 
@@ -17,6 +30,16 @@ function CanvasEntity:on_activate(staticdata)
 
     if staticdata ~= "" then
         local data = minetest.deserialize(staticdata)
+
+        if not validate_staticdata(data) then
+            -- This should never happen.
+            local p = self.object:get_pos():to_string()
+            self.object:remove()
+            minetest.log("warning",
+                "Removed ggraffiti:canvas entity at " .. p .. " in on_activate because of invalid staticdata")
+            return
+        end
+
         self.size = data.size
         self.bitmap_size = data.bitmap_size
         self.bitmap = data.bitmap
