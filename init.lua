@@ -4,7 +4,7 @@ if not modlib.minetest.get_node_selectionboxes then
         '────────────────────────────────────────────────────────────────────────────────────────────────────\n' ..
         'You have an outdated version of the "Modding Library" mod installed. Please go to the "Content" tab and update the "Modding Library" mod.\n' ..
         '────────────────────────────────────────────────────────────────────────────────────────────────────\n',
-        2
+        0
     )
 end
 
