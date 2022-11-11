@@ -8,7 +8,7 @@ if not modlib.minetest.get_node_selectionboxes then
     )
 end
 
-local t = minetest.get_translator("ggraffiti")
+local S = minetest.get_translator("ggraffiti")
 local aabb = dofile(minetest.get_modpath("ggraffiti") .. "/aabb.lua")
 dofile(minetest.get_modpath("ggraffiti") .. "/canvas.lua")
 
@@ -150,13 +150,13 @@ local function spray_can_on_use(item, player)
     player_lasts[player_name] = {pos = pos, dir = dir}
 
     if not minetest.is_creative_enabled(player_name) then
-        local item, _ = wear_out(item, 1)
+        item = wear_out(item, 1)
         return item
     end
 end
 
 minetest.register_craftitem("ggraffiti:spray_can_empty", { -- stackable
-    description = t("Empty Spray Can"),
+    description = S("Empty Spray Can"),
     inventory_image = "ggraffiti_spray_can.png",
 
     range = MAX_SPRAY_DISTANCE,
@@ -172,7 +172,7 @@ for _, dye in ipairs(dye.dyes) do
     local item_name = "ggraffiti:spray_can_" .. dye_name
 
     minetest.register_tool(item_name, {
-        description = t("Graffiti Spray Can (" .. dye_desc:lower() .. ")"),
+        description = S("Graffiti Spray Can (" .. dye_desc:lower() .. ")"),
         inventory_image = "ggraffiti_spray_can.png^(ggraffiti_spray_can_color.png^[multiply:" .. dye_color .. ")",
 
         range = MAX_SPRAY_DISTANCE,
@@ -195,7 +195,7 @@ for _, dye in ipairs(dye.dyes) do
 end
 
 minetest.register_craftitem("ggraffiti:mushroom_red_extract", {
-    description = t("Red Mushroom Extract"),
+    description = S("Red Mushroom Extract"),
     inventory_image = "ggraffiti_mushroom_red_extract.png",
 })
 
@@ -205,7 +205,7 @@ minetest.register_craft({
 })
 
 minetest.register_tool("ggraffiti:spray_can_anti", {
-    description = t("Anti-Graffiti Spray Can"),
+    description = S("Anti-Graffiti Spray Can"),
     inventory_image = "ggraffiti_spray_can_anti.png",
 
     range = MAX_SPRAY_DISTANCE,

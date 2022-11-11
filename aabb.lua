@@ -24,7 +24,7 @@ function aabb:repair()
 end
 
 function aabb:get_center()
-    return (self.pos_min + self.pos_max) / 2 
+    return (self.pos_min + self.pos_max) / 2
 end
 
 function aabb:get_size()
