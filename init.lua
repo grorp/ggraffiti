@@ -93,10 +93,8 @@ local function spraycast(player, pos, dir, def)
 
         local obj = minetest.add_entity(canvas_pos, "ggraffiti:canvas")
         obj:set_rotation(canvas_rot)
-
         canvas = obj:get_luaentity()
-        canvas.size = {x = rot_box_size.x, y = rot_box_size.y}
-        canvas:create_bitmap()
+        canvas:setup({x = rot_box_size.x, y = rot_box_size.y})
     end
 
     local root_pos = node_pos + box_center + vector.new(0, 0, rot_box_size.z * 0.5):rotate(canvas_rot)
@@ -116,7 +114,7 @@ local function spraycast(player, pos, dir, def)
     if def.anti then
         if canvas.bitmap[index] ~= TRANSPARENT then
             canvas.bitmap[index] = TRANSPARENT
-            if canvas:is_bitmap_empty() then
+            if canvas:is_empty() then
                 canvas.object:remove()
             else
                 canvas:update()
