@@ -106,26 +106,26 @@ local function spraycast(player, pos, dir, def)
     pos_on_face = pos_on_face + vector.new(rot_box_size.x / 2, rot_box_size.y / 2, 0)
 
     local pos_on_bitmap = vector.new( -- 2D too, of course
-        math.floor(pos_on_face.x / rot_box_size.x * canvas.bitmap_size.x),
-        math.floor(pos_on_face.y / rot_box_size.y * canvas.bitmap_size.y),
+        pos_on_face.x / rot_box_size.x * canvas.bitmap_size.x,
+        pos_on_face.y / rot_box_size.y * canvas.bitmap_size.y,
         0
     )
-    local index = pos_on_bitmap.y * canvas.bitmap_size.x + pos_on_bitmap.x + 1
+
+    local rect_size = 3
+    local rect_x, rect_y =
+        math.round(pos_on_bitmap - rect_size / 2),
+        math.round(pos_on_bitmap - rect_size / 2)
 
     if def.remover then
-        if canvas.bitmap[index] ~= TRANSPARENT then
-            canvas.bitmap[index] = TRANSPARENT
-            if canvas:is_empty() then
-                canvas.object:remove()
-            else
-                canvas:update()
-            end
-        end
-    else
-        if canvas.bitmap[index] ~= def.color then
-            canvas.bitmap[index] = def.color
+        canvas:rectangle(rect_x, rect_y, rect_size, rect_size, TRANSPARENT)
+        if canvas:is_empty() then
+            canvas.object:remove()
+        else
             canvas:update()
         end
+    else
+        canvas:rectangle(rect_x, rect_y, rect_size, rect_size, def.color)
+        canvas:update()
     end
 end
 
