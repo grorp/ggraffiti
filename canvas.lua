@@ -1,6 +1,78 @@
 local DESIRED_PIXEL_SIZE = 1/16
 local TRANSPARENT = "#00000000"
 
+local aabb = dofile(minetest.get_modpath("ggraffiti") .. "/aabb.lua")
+
+local canvas = {}
+
+function canvas.get(pos, box, face_normal)
+    local box_center = box:get_center()
+
+    local canvas_rot = vector.dir_to_rotation(face_normal)
+    local rot_box = aabb.new(
+        box.pos_min:rotate(canvas_rot),
+        box.pos_max:rotate(canvas_rot)
+    )
+    rot_box:repair()
+    local rot_box_size = rot_box:get_size()
+
+    local canvas_pos = pos +
+        box_center +
+        vector.new(0, 0, rot_box_size.z * 0.5 + 0.001):rotate(canvas_rot)
+
+    local objs = minetest.get_objects_inside_radius(canvas_pos, 0.001)
+    for _, obj in ipairs(objs) do
+        local ent = obj:get_luaentity()
+        if ent and ent.name == "ggraffiti:canvas" then
+            return ent
+        end
+    end
+end
+
+function canvas.create(pos, box, face_normal)
+    local box_center = box:get_center()
+
+    local canvas_rot = vector.dir_to_rotation(face_normal)
+    local rot_box = aabb.new(
+        box.pos_min:rotate(canvas_rot),
+        box.pos_max:rotate(canvas_rot)
+    )
+    rot_box:repair()
+    local rot_box_size = rot_box:get_size()
+
+    local canvas_pos = pos +
+        box_center +
+        vector.new(0, 0, rot_box_size.z * 0.5 + 0.001):rotate(canvas_rot)
+
+    local obj = minetest.add_entity(canvas_pos, "ggraffiti:canvas")
+    obj:set_rotation(canvas_rot)
+    local ent = obj:get_luaentity()
+    ent:setup({x = rot_box_size.x, y = rot_box_size.y})
+    return ent
+end
+
+function canvas.transform_point(pos, box, face_normal, point)
+    local box_center = box:get_center()
+
+    local canvas_rot = vector.dir_to_rotation(face_normal)
+    local rot_box = aabb.new(
+        box.pos_min:rotate(canvas_rot),
+        box.pos_max:rotate(canvas_rot)
+    )
+    rot_box:repair()
+    local rot_box_size = rot_box:get_size()
+
+    local root_pos = pos +
+        box_center +
+        vector.new(0, 0, rot_box_size.z * 0.5):rotate(canvas_rot)
+
+    local distance = point - root_pos
+
+    -- 2D (Z is always zero)
+    return vector.new(-distance.x, -distance.y, distance.z):rotate(canvas_rot) +
+        vector.new(rot_box_size.x / 2, rot_box_size.y / 2, 0)
+end
+
 local CanvasEntity = {
     initial_properties = {
         visual = "upright_sprite",
@@ -74,6 +146,22 @@ function CanvasEntity:update()
     })
 end
 
+local function clamp(min, val, max) return math.max(min, math.min(val, max)) end
+
+function CanvasEntity:rectangle(x, y, width, height, color)
+    local x1, y1 =
+        clamp(0, x, self.bitmap_size.x - 1),
+        clamp(0, y, self.bitmap_size.y - 1)
+    local x2, y2 =
+        clamp(0, x + width - 1, self.bitmap_size.x - 1),
+        clamp(0, y + height - 1, self.bitmap_size.y - 1)
+    for xx = x1, x2 do
+        for yy = y1, y2 do
+            self.bitmap[yy * self.bitmap_size.x + xx + 1] = color
+        end
+    end
+end
+
 function CanvasEntity:is_empty()
     for _, c in ipairs(self.bitmap) do
         if c ~= TRANSPARENT then
@@ -92,3 +180,5 @@ function CanvasEntity:get_staticdata()
 end
 
 minetest.register_entity("ggraffiti:canvas", CanvasEntity)
+
+return canvas

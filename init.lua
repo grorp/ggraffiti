@@ -10,7 +10,7 @@ end
 
 local S = minetest.get_translator("ggraffiti")
 local aabb = dofile(minetest.get_modpath("ggraffiti") .. "/aabb.lua")
-dofile(minetest.get_modpath("ggraffiti") .. "/canvas.lua")
+local canvasa = dofile(minetest.get_modpath("ggraffiti") .. "/canvas.lua")
 
 local SPRAY_DURATION = 240
 -- Clients send the position of their player every 0.1 seconds.
@@ -43,74 +43,6 @@ local DYE_COLORS = {
 
 local player_lasts = {}
 
-local function get_canvas(pos, box, face_normal)
-    local box_center = box:get_center()
-
-    local canvas_rot = vector.dir_to_rotation(face_normal)
-    local rot_box = aabb.new(
-        box.pos_min:rotate(canvas_rot),
-        box.pos_max:rotate(canvas_rot)
-    )
-    rot_box:repair()
-    local rot_box_size = rot_box:get_size()
-
-    local canvas_pos = pos +
-        box_center +
-        vector.new(0, 0, rot_box_size.z * 0.5 + 0.001):rotate(canvas_rot)
-
-    local objs = minetest.get_objects_inside_radius(canvas_pos, 0.001)
-    for _, obj in ipairs(objs) do
-        local ent = obj:get_luaentity()
-        if ent and ent.name == "ggraffiti:canvas" then
-            return ent
-        end
-    end
-end
-
-local function create_canvas(pos, box, face_normal)
-    local box_center = box:get_center()
-
-    local canvas_rot = vector.dir_to_rotation(face_normal)
-    local rot_box = aabb.new(
-        box.pos_min:rotate(canvas_rot),
-        box.pos_max:rotate(canvas_rot)
-    )
-    rot_box:repair()
-    local rot_box_size = rot_box:get_size()
-
-    local canvas_pos = pos +
-        box_center +
-        vector.new(0, 0, rot_box_size.z * 0.5 + 0.001):rotate(canvas_rot)
-
-    local obj = minetest.add_entity(canvas_pos, "ggraffiti:canvas")
-    obj:set_rotation(canvas_rot)
-    local ent = obj:get_luaentity()
-    ent:setup({x = rot_box_size.x, y = rot_box_size.y})
-    return ent
-end
-
-local function get_point_on_canvas(pos, box, face_normal, point)
-    local box_center = box:get_center()
-
-    local canvas_rot = vector.dir_to_rotation(face_normal)
-    local rot_box = aabb.new(
-        box.pos_min:rotate(canvas_rot),
-        box.pos_max:rotate(canvas_rot)
-    )
-    rot_box:repair()
-    local rot_box_size = rot_box:get_size()
-
-    local root_pos = pos +
-        box_center +
-        vector.new(0, 0, rot_box_size.z * 0.5):rotate(canvas_rot)
-
-    local distance = point - root_pos
-
-    -- 2D (Z is always zero)
-    return vector.new(-distance.x, -distance.y, distance.z):rotate(canvas_rot) +
-        vector.new(rot_box_size.x / 2, rot_box_size.y / 2, 0)
-end
-
 local function spraycast(player, pos, dir, def)
     local ray = minetest.raycast(pos, pos + dir * MAX_SPRAY_DISTANCE, true, false)
     local pthing
@@ -134,35 +66,30 @@ local function spraycast(player, pos, dir, def)
     if not raw_box then return end -- Modlib failed 😱
     local box = aabb.from(raw_box)
 
-    local canvas = get_canvas(pos, box, pthing.intersection_normal)
+    local canvas = canvasa.get(pos, box, pthing.intersection_normal)
     if not canvas then
         if def.anti then return end
-        canvas = create_canvas(pos, box, pthing.intersection_normal)
+        canvas = canvasa.create(pos, box, pthing.intersection_normal)
     end
 
-    local point = get_point_on_canvas(
+    local point = canvasa.transform_point(
         pos, box, pthing.intersection_normal, pthing.intersection_point)
-    local pixel = vector.new(
-        math.floor(point.x / canvas.size.x * canvas.bitmap_size.x),
-        math.floor(point.y / canvas.size.y * canvas.bitmap_size.y),
-        0
-    )
-    local index = pixel.y * canvas.bitmap_size.x + pixel.x + 1
+
+    local rect_size = 3
+    local rect_x, rect_y =
+        math.round(point.x / canvas.size.x * canvas.bitmap_size.x - rect_size / 2),
+        math.round(point.y / canvas.size.y * canvas.bitmap_size.y - rect_size / 2)
 
     if def.anti then
-        if canvas.bitmap[index] ~= TRANSPARENT then
-            canvas.bitmap[index] = TRANSPARENT
-            if canvas:is_empty() then
-                canvas.object:remove()
-            else
-                canvas:update()
-            end
-        end
-    else
-        if canvas.bitmap[index] ~= def.color then
-            canvas.bitmap[index] = def.color
+        canvas:rectangle(rect_x, rect_y, rect_size, rect_size, TRANSPARENT)
+        if canvas:is_empty() then
+            canvas.object:remove()
+        else
             canvas:update()
         end
+    else
+        canvas:rectangle(rect_x, rect_y, rect_size, rect_size, def.color)
+        canvas:update()
     end
 end
 
