@@ -2,7 +2,8 @@ if not modlib.minetest.get_node_selectionboxes then
     error(
         '\n' ..
         '────────────────────────────────────────────────────────────────────────────────────────────────────\n' ..
-        'You have an outdated version of the "Modding Library" mod installed. Please go to the "Content" tab and update the "Modding Library" mod.\n' ..
+        'You have an outdated version of the "Modding Library" mod installed. ' ..
+        'Please go to the "Content" tab and update the "Modding Library" mod.\n' ..
         '────────────────────────────────────────────────────────────────────────────────────────────────────\n',
         0
     )
@@ -12,7 +13,7 @@ local S = minetest.get_translator("ggraffiti")
 local aabb = dofile(minetest.get_modpath("ggraffiti") .. "/aabb.lua")
 dofile(minetest.get_modpath("ggraffiti") .. "/canvas.lua")
 
-local SPRAY_DURATION = 240
+local SPRAY_DURATION = 4 * 60
 -- Clients send the position of their player every 0.1 seconds.
 -- https://github.com/minetest/minetest/blob/5.6.1/src/client/client.h#L563
 -- https://github.com/minetest/minetest/blob/5.6.1/src/client/client.cpp#L528
@@ -80,10 +81,10 @@ local function spraycast(player, pos, dir, def)
     local canvas
 
     local findings = minetest.get_objects_inside_radius(canvas_pos, 0.001)
-    for _, fobj in ipairs(findings) do
-        local fent = fobj:get_luaentity()
-        if fent and fent.name == "ggraffiti:canvas" then
-            canvas = fent
+    for _, obj in ipairs(findings) do
+        local ent = obj:get_luaentity()
+        if ent and ent.name == "ggraffiti:canvas" then
+            canvas = ent
             break
         end
     end

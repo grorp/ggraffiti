@@ -40,6 +40,17 @@ function CanvasEntity:on_activate(staticdata)
             return
         end
 
+        -- "Overwrite" other canvases in the same place.
+        local rivals = minetest.get_objects_inside_radius(self.object:get_pos(), 0.001)
+        for _, obj in ipairs(rivals) do
+            if obj ~= self.object then
+                local ent = obj:get_luaentity()
+                if ent and ent.name == "ggraffiti:canvas" then
+                    obj:remove()
+                end
+            end
+        end
+
         self.size = data.size
         self.bitmap_size = data.bitmap_size
         self.bitmap = data.bitmap
