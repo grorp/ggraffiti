@@ -80,7 +80,7 @@ local function spraycast(player, pos, dir, def)
     local canvas_pos = node_pos + box_center + vector.new(0, 0, rot_box_size.z * 0.5 + 0.001):rotate(canvas_rot)
     local canvas
 
-    local findings = minetest.get_objects_inside_radius(canvas_pos, 0.001)
+    local findings = minetest.get_objects_inside_radius(canvas_pos, 0.0001)
     for _, obj in ipairs(findings) do
         local ent = obj:get_luaentity()
         if ent and ent.name == "ggraffiti:canvas" then

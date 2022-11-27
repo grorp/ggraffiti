@@ -41,7 +41,7 @@ function CanvasEntity:on_activate(staticdata)
         end
 
         -- "Overwrite" other canvases in the same place.
-        local rivals = minetest.get_objects_inside_radius(self.object:get_pos(), 0.001)
+        local rivals = minetest.get_objects_inside_radius(self.object:get_pos(), 0.0001)
         for _, obj in ipairs(rivals) do
             if obj ~= self.object then
                 local ent = obj:get_luaentity()
