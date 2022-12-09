@@ -16,9 +16,9 @@ Press and hold the dig button (the one you normally use to remove blocks) to pai
 
 ![](./docpics/recipe_red_mushroom_extract.png)
 
-**Anti-Graffiti Spray Can**
+**Graffiti Remover Spray Can**
 
-![](./docpics/recipe_anti_spray_can.png)
+![](./docpics/recipe_remover_spray_can.png)
 
 A spray can that removes graffiti. Essentially an eraser.
 

@@ -90,7 +90,7 @@ local function spraycast(player, pos, dir, def)
     end
 
     if not canvas then
-        if def.anti then return end
+        if def.remover then return end
 
         local obj = minetest.add_entity(canvas_pos, "ggraffiti:canvas")
         obj:set_rotation(canvas_rot)
@@ -112,7 +112,7 @@ local function spraycast(player, pos, dir, def)
     )
     local index = pos_on_bitmap.y * canvas.bitmap_size.x + pos_on_bitmap.x + 1
 
-    if def.anti then
+    if def.remover then
         if canvas.bitmap[index] ~= TRANSPARENT then
             canvas.bitmap[index] = TRANSPARENT
             if canvas:is_empty() then
@@ -203,18 +203,20 @@ minetest.register_craft({
     output = "ggraffiti:mushroom_red_extract 4",
 })
 
-minetest.register_tool("ggraffiti:spray_can_anti", {
-    description = S("Anti-Graffiti Spray Can"),
-    inventory_image = "ggraffiti_spray_can_anti.png",
+minetest.register_tool("ggraffiti:spray_can_remover", {
+    description = S("Graffiti Remover Spray Can"),
+    inventory_image = "ggraffiti_spray_can_remover.png",
 
     range = MAX_SPRAY_DISTANCE,
     on_use = spray_can_on_use,
     _ggraffiti_spray_can = {
-        anti = true,
+        remover = true,
     },
 
     groups = {ggraffiti_spray_can = 1},
 })
+
+minetest.register_alias("ggraffiti:spray_can_anti", "ggraffiti:spray_can_remover")
 
 minetest.register_craft({
     recipe = {
@@ -222,7 +224,7 @@ minetest.register_craft({
         {"ggraffiti:mushroom_red_extract"},
         {"default:steel_ingot"},
     },
-    output = "ggraffiti:spray_can_anti",
+    output = "ggraffiti:spray_can_remover",
 })
 
 minetest.register_craft({
