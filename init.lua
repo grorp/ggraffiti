@@ -12,6 +12,7 @@ end
 local S = minetest.get_translator("ggraffiti")
 local aabb = dofile(minetest.get_modpath("ggraffiti") .. "/aabb.lua")
 dofile(minetest.get_modpath("ggraffiti") .. "/canvas.lua")
+dofile(minetest.get_modpath("ggraffiti") .. "/inv.lua")
 
 local SPRAY_DURATION = 4 * 60
 -- Clients send the position of their player every 0.1 seconds.
