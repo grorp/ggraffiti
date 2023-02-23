@@ -135,7 +135,12 @@ local function get_eye_pos(player)
     return pos
 end
 
-local function wear_out(item, uses)
+local function wear_out(player_name, item, uses)
+    if minetest.is_creative_enabled(player_name) then
+        -- Don't wear out the item and allow unlimited uses if the player is in
+        -- creative mode.
+        return item, uses
+    end
     for i = 1, uses do
         item:add_wear_by_uses(SPRAY_DURATION / SPRAY_STEP_INTERVAL * NUM_SPRAY_STEPS)
         if item:is_empty() then
@@ -153,10 +158,8 @@ local function spray_can_on_use(item, player)
     spraycast(player, pos, dir, item:get_definition()._ggraffiti_spray_can)
     player_lasts[player_name] = {pos = pos, dir = dir}
 
-    if not minetest.is_creative_enabled(player_name) then
-        item = wear_out(item, 1)
-        return item
-    end
+    item = wear_out(player_name, item, 1)
+    return item
 end
 
 minetest.register_craftitem("ggraffiti:spray_can_empty", { -- stackable
@@ -258,10 +261,8 @@ local function spray_step()
 
             if last then
                 local n_steps = NUM_SPRAY_STEPS
-                if not minetest.is_creative_enabled(player_name) then
-                    item, n_steps = wear_out(item, n_steps)
-                    player:set_wielded_item(item)
-                end
+                item, n_steps = wear_out(player_name, item, n_steps)
+                player:set_wielded_item(item)
 
                 if now_pos:equals(last.pos) and now_dir:equals(last.dir) then
                     -- The player hasn't moved, but the world may have changed.
