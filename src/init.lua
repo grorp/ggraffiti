@@ -42,7 +42,8 @@ shared.DYE_COLORS = {
     yellow = "#fcf611",
 }
 
-assert(loadfile(minetest.get_modpath("ggraffiti") .. "/aabb.lua"))(shared)
-assert(loadfile(minetest.get_modpath("ggraffiti") .. "/canvas.lua"))(shared)
-assert(loadfile(minetest.get_modpath("ggraffiti") .. "/spraycast.lua"))(shared)
-assert(loadfile(minetest.get_modpath("ggraffiti") .. "/items.lua"))(shared)
+local basepath = minetest.get_modpath("ggraffiti") .. "/src"
+assert(loadfile(basepath .. "/aabb.lua"))(shared)
+assert(loadfile(basepath .. "/canvas.lua"))(shared)
+assert(loadfile(basepath .. "/spraycast.lua"))(shared)
+assert(loadfile(basepath .. "/items.lua"))(shared)
