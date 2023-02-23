@@ -16,7 +16,7 @@ shared.SPRAY_DURATION = 4 * 60
 -- https://github.com/minetest/minetest/blob/5.6.1/src/client/client.h#L563
 -- https://github.com/minetest/minetest/blob/5.6.1/src/client/client.cpp#L528
 shared.SPRAY_STEP_INTERVAL = 0.1
-shared.NUM_SPRAY_STEPS = 5
+shared.NUM_SPRAY_STEPS = 7
 
 shared.MAX_SPRAY_DISTANCE = 4
 

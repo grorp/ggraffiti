@@ -67,7 +67,7 @@ function shared.spraycast(player, pos, dir, def)
         0
     )
 
-    local sq_size = 3
+    local sq_size = 1
     local sq_pos_x, sq_pos_y =
         math.round(pos_on_bitmap.x - sq_size / 2),
         math.round(pos_on_bitmap.y - sq_size / 2)
