@@ -1,6 +1,9 @@
+local shared = ...
+shared.aabb = {}
+
 -- AABB = Axis-aligned bounding box
 
-local aabb = {}
+local aabb = shared.aabb
 aabb.__index = aabb
 
 function aabb.new(pos_min, pos_max)
@@ -30,5 +33,3 @@ end
 function aabb:get_size()
     return self.pos_max - self.pos_min
 end
-
-return aabb

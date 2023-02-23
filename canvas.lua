@@ -1,5 +1,4 @@
-local DESIRED_PIXEL_SIZE = 1/16
-local TRANSPARENT = "#00000000"
+local shared = ...
 
 local CanvasEntity = {
     initial_properties = {
@@ -61,12 +60,12 @@ end
 function CanvasEntity:setup(size)
     self.size = size
     self.bitmap_size = {
-        x = math.max(math.round(self.size.x / DESIRED_PIXEL_SIZE), 1), -- minimum 1x1 pixels
-        y = math.max(math.round(self.size.y / DESIRED_PIXEL_SIZE), 1),
+        x = math.max(math.round(self.size.x / shared.DESIRED_PIXEL_SIZE), 1), -- minimum 1x1 pixels
+        y = math.max(math.round(self.size.y / shared.DESIRED_PIXEL_SIZE), 1),
     }
     self.bitmap = {}
     for i = 1, self.bitmap_size.x * self.bitmap_size.y do
-        self.bitmap[i] = TRANSPARENT
+        self.bitmap[i] = shared.TRANSPARENT
     end
 end
 
@@ -105,7 +104,7 @@ end
 
 function CanvasEntity:is_empty()
     for _, c in ipairs(self.bitmap) do
-        if c ~= TRANSPARENT then
+        if c ~= shared.TRANSPARENT then
             return false
         end
     end
