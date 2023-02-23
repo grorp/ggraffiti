@@ -84,17 +84,17 @@ function CanvasEntity:update()
     })
 end
 
-local function clamp(min, val, max)
+local function clamp(val, min, max)
     return math.max(min, math.min(val, max))
 end
 
 function CanvasEntity:rectangle(x, y, width, height, color)
     local x1, y1 =
-        clamp(0, x, self.bitmap_size.x - 1),
-        clamp(0, y, self.bitmap_size.y - 1)
+        clamp(x, 0, self.bitmap_size.x - 1),
+        clamp(y, 0, self.bitmap_size.y - 1)
     local x2, y2 =
-        clamp(0, x + width - 1, self.bitmap_size.x - 1),
-        clamp(0, y + height - 1, self.bitmap_size.y - 1)
+        clamp(x + width - 1, 0, self.bitmap_size.x - 1),
+        clamp(y + height - 1, 0, self.bitmap_size.y - 1)
     for xx = x1, x2 do
         for yy = y1, y2 do
             self.bitmap[yy * self.bitmap_size.x + xx + 1] = color
