@@ -42,8 +42,6 @@ local DYE_COLORS = {
     yellow = "#fcf611",
 }
 
-local player_lasts = {}
-
 local function spraycast(player, pos, dir, def)
     local ray = minetest.raycast(pos, pos + dir * MAX_SPRAY_DISTANCE, true, false)
     local pthing
@@ -111,22 +109,30 @@ local function spraycast(player, pos, dir, def)
         0
     )
 
-    local rect_size = 3
-    local rect_x, rect_y =
-        math.round(pos_on_bitmap - rect_size / 2),
-        math.round(pos_on_bitmap - rect_size / 2)
+    local sq_size = 3
+    local sq_pos_x, sq_pos_y =
+        math.round(pos_on_bitmap.x - sq_size / 2),
+        math.round(pos_on_bitmap.y - sq_size / 2)
 
     if def.remover then
-        canvas:rectangle(rect_x, rect_y, rect_size, rect_size, TRANSPARENT)
+        canvas:rectangle(sq_pos_x, sq_pos_y, sq_size, sq_size, TRANSPARENT)
         if canvas:is_empty() then
             canvas.object:remove()
         else
             canvas:update()
         end
     else
-        canvas:rectangle(rect_x, rect_y, rect_size, rect_size, def.color)
+        canvas:rectangle(sq_pos_x, sq_pos_y, sq_size, sq_size, def.color)
         canvas:update()
     end
+end
+
+local player_lasts = {}
+
+local function get_eye_pos(player)
+    local pos = player:get_pos()
+    pos.y = pos.y + player:get_properties().eye_height
+    return pos
 end
 
 local function wear_out(item, uses)
@@ -142,8 +148,7 @@ end
 local function spray_can_on_use(item, player)
     local player_name = player:get_player_name()
 
-    local pos = player:get_pos()
-    pos.y = pos.y + player:get_properties().eye_height
+    local pos = get_eye_pos(player)
     local dir = player:get_look_dir()
     spraycast(player, pos, dir, item:get_definition()._ggraffiti_spray_can)
     player_lasts[player_name] = {pos = pos, dir = dir}
@@ -161,7 +166,7 @@ minetest.register_craftitem("ggraffiti:spray_can_empty", { -- stackable
     range = MAX_SPRAY_DISTANCE,
     on_use = function() end,
 
-    groups = {ggraffiti_spray_can = 1},
+    groups = {ggraffiti_spray_can = 1, tool = 1},
 })
 
 for _, dye in ipairs(dye.dyes) do
@@ -233,52 +238,46 @@ minetest.register_craft({
     output = "default:steel_ingot 2",
 })
 
-local function lerp(a, b, t)
-    return a + (b - a) * t
+local function lerp_factory(t)
+    return function(a, b)
+        return a + (b - a) * t
+    end
 end
 
 local function spray_step()
     for _, player in ipairs(minetest.get_connected_players()) do
         local player_name = player:get_player_name()
+        local item = player:get_wielded_item()
+        local def = item:get_definition()
 
-        if player:get_player_control().dig then
-            local item = player:get_wielded_item()
-            local def = item:get_definition()
+        if def._ggraffiti_spray_can and player:get_player_control().dig then
+            local last = player_lasts[player_name]
 
-            if def._ggraffiti_spray_can then
-                local last = player_lasts[player_name]
+            local now_pos = get_eye_pos(player)
+            local now_dir = player:get_look_dir()
 
-                local now_pos = player:get_pos()
-                now_pos.y = now_pos.y + player:get_properties().eye_height
-                local now_dir = player:get_look_dir()
-
-                if last then
-                    local n_steps = NUM_SPRAY_STEPS
-                    if not minetest.is_creative_enabled(player_name) then
-                        item, n_steps = wear_out(item, n_steps)
-                        player:set_wielded_item(item)
-                    end
-
-                    if now_pos:equals(last.pos) and now_dir:equals(last.dir) then
-                        -- The player hasn't moved, but the world may have changed.
-                        spraycast(player, now_pos, now_dir, def._ggraffiti_spray_can)
-                    else
-                        for step_n = 1, n_steps do
-                            local combine_lerp = function(a, b)
-                                return lerp(a, b, step_n / n_steps)
-                            end
-                            local pos = vector.combine(last.pos, now_pos, combine_lerp)
-                            local dir = vector.combine(last.dir, now_dir, combine_lerp):normalize()
-
-                            spraycast(player, pos, dir, def._ggraffiti_spray_can)
-                        end
-                    end
+            if last then
+                local n_steps = NUM_SPRAY_STEPS
+                if not minetest.is_creative_enabled(player_name) then
+                    item, n_steps = wear_out(item, n_steps)
+                    player:set_wielded_item(item)
                 end
 
-                player_lasts[player_name] = {pos = now_pos, dir = now_dir}
-            else
-                player_lasts[player_name] = nil
+                if now_pos:equals(last.pos) and now_dir:equals(last.dir) then
+                    -- The player hasn't moved, but the world may have changed.
+                    spraycast(player, now_pos, now_dir, def._ggraffiti_spray_can)
+                else
+                    for step_n = 1, n_steps do
+                        local lerp = lerp_factory(step_n / n_steps)
+                        local pos = vector.combine(last.pos, now_pos, lerp)
+                        local dir = vector.combine(last.dir, now_dir, lerp):normalize() -- "nlerp"
+
+                        spraycast(player, pos, dir, def._ggraffiti_spray_can)
+                    end
+                end
             end
+
+            player_lasts[player_name] = {pos = now_pos, dir = now_dir}
         else
             player_lasts[player_name] = nil
         end

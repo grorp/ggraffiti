@@ -40,6 +40,11 @@ function CanvasEntity:on_activate(staticdata)
             return
         end
 
+        self.size = data.size
+        self.bitmap_size = data.bitmap_size
+        self.bitmap = data.bitmap
+        self:update()
+
         -- "Overwrite" other canvases in the same place.
         local rivals = minetest.get_objects_inside_radius(self.object:get_pos(), 0.0001)
         for _, obj in ipairs(rivals) do
@@ -50,11 +55,6 @@ function CanvasEntity:on_activate(staticdata)
                 end
             end
         end
-
-        self.size = data.size
-        self.bitmap_size = data.bitmap_size
-        self.bitmap = data.bitmap
-        self:update()
     end
 end
 
