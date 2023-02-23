@@ -1,5 +1,16 @@
 local shared = ...
 
+local canvas_update_queue = {}
+
+local function add_canvas_to_update_queue(canvas)
+    for _, item in ipairs(canvas_update_queue) do
+        if item == canvas then
+            return
+        end
+    end
+    table.insert(canvas_update_queue, canvas)
+end
+
 local CanvasEntity = {
     initial_properties = {
         visual = "upright_sprite",
@@ -42,7 +53,7 @@ function CanvasEntity:on_activate(staticdata)
         self.size = data.size
         self.bitmap_size = data.bitmap_size
         self.bitmap = data.bitmap
-        self:update()
+        self:update_immediately()
 
         -- "Overwrite" other canvases in the same place.
         local rivals = minetest.get_objects_inside_radius(self.object:get_pos(), 0.0001)
@@ -69,7 +80,11 @@ function CanvasEntity:setup(size)
     end
 end
 
-function CanvasEntity:update()
+function CanvasEntity:update_later()
+    add_canvas_to_update_queue(self)
+end
+
+function CanvasEntity:update_immediately()
     local png = minetest.encode_base64(
         minetest.encode_png(self.bitmap_size.x, self.bitmap_size.y, self.bitmap, 9)
     )
@@ -120,3 +135,11 @@ function CanvasEntity:get_staticdata()
 end
 
 minetest.register_entity("ggraffiti:canvas", CanvasEntity)
+
+function shared.update_canvases()
+    for _, canvas in ipairs(canvas_update_queue) do
+        -- This doesn't cause a crash if the canvas entity has been removed.
+        canvas:update_immediately()
+    end
+    canvas_update_queue = {}
+end

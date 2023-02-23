@@ -166,5 +166,6 @@ minetest.register_globalstep(function(dtime)
     if dtime_accu >= shared.SPRAY_STEP_INTERVAL then
         dtime_accu = dtime_accu % shared.SPRAY_STEP_INTERVAL
         spray_step()
+        shared.update_canvases()
     end
 end)

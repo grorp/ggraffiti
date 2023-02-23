@@ -52,6 +52,7 @@ function shared.spraycast(player, pos, dir, def)
         obj:set_rotation(canvas_rot)
         canvas = obj:get_luaentity()
         canvas:setup({x = rot_box_size.x, y = rot_box_size.y})
+        canvas:update_immediately() -- Avoid flash of "no texture" texture.
     end
 
     local root_pos = node_pos + box_center + vector.new(0, 0, rot_box_size.z * 0.5):rotate(canvas_rot)
@@ -77,10 +78,10 @@ function shared.spraycast(player, pos, dir, def)
         if canvas:is_empty() then
             canvas.object:remove()
         else
-            canvas:update()
+            canvas:update_later()
         end
     else
         canvas:rectangle(sq_pos_x, sq_pos_y, sq_size, sq_size, def.color)
-        canvas:update()
+        canvas:update_later()
     end
 end
