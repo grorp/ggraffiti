@@ -4,6 +4,11 @@ This Minetest mod adds graffiti that lets you paint whatever you want on any nod
 
 <img src="./docpics/screenshot_cdb.png" style="width: 512px;" />
 
+Changes in `v1.0.0-alpha.8`:
+
+- Graffiti is now removed when you dig the node it is attached to.
+- Performance improvements
+
 This mod is a Work in Progress.
 
 ## Items
