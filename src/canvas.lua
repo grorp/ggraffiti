@@ -19,15 +19,22 @@ local CanvasEntity = {
     },
 }
 
+local function validate_vec2(data)
+    return type(data) == "table" and
+        type(data.x) == "number" and
+        type(data.y) == "number"
+end
+local function validate_vec3(data)
+    return validate_vec2(data) and
+        type(data.z) == "number"
+end
+
 local function validate_staticdata(data)
     return
         type(data) == "table" and
-        type(data.size) == "table" and
-        type(data.size.x) == "number" and
-        type(data.size.y) == "number" and
-        type(data.bitmap_size) == "table" and
-        type(data.bitmap_size.x) == "number" and
-        type(data.bitmap_size.y) == "number" and
+        validate_vec3(data.node_pos) and
+        validate_vec2(data.size) and
+        validate_vec2(data.bitmap_size) and
         type(data.bitmap) == "table" and
         #data.bitmap == data.bitmap_size.x * data.bitmap_size.y
 end
@@ -50,6 +57,7 @@ function CanvasEntity:on_activate(staticdata)
             return
         end
 
+        self.node_pos = data.node_pos
         self.size = data.size
         self.bitmap_size = data.bitmap_size
         self.bitmap = data.bitmap
@@ -68,7 +76,8 @@ function CanvasEntity:on_activate(staticdata)
     end
 end
 
-function CanvasEntity:setup(size)
+function CanvasEntity:setup(node_pos, size)
+    self.node_pos = node_pos
     self.size = size
     self.bitmap_size = {
         x = math.max(math.round(self.size.x / shared.DESIRED_PIXEL_SIZE), 1), -- minimum 1x1 pixels
@@ -128,6 +137,7 @@ end
 
 function CanvasEntity:get_staticdata()
     return minetest.serialize({
+        node_pos = self.node_pos,
         size = self.size,
         bitmap_size = self.bitmap_size,
         bitmap = self.bitmap,
