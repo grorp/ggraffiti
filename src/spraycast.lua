@@ -63,25 +63,25 @@ function shared.spraycast(player, pos, dir, def)
     pos_on_face = pos_on_face + vector.new(rot_box_size.x / 2, rot_box_size.y / 2, 0)
 
     local pos_on_bitmap = vector.new( -- 2D too, of course
-        pos_on_face.x / rot_box_size.x * canvas.bitmap_size.x,
-        pos_on_face.y / rot_box_size.y * canvas.bitmap_size.y,
+        math.floor(pos_on_face.x / rot_box_size.x * canvas.bitmap_size.x),
+        math.floor(pos_on_face.y / rot_box_size.y * canvas.bitmap_size.y),
         0
     )
-
-    local sq_size = 1
-    local sq_pos_x, sq_pos_y =
-        math.round(pos_on_bitmap.x - sq_size / 2),
-        math.round(pos_on_bitmap.y - sq_size / 2)
+    local index = pos_on_bitmap.y * canvas.bitmap_size.x + pos_on_bitmap.x + 1
 
     if def.remover then
-        canvas:rectangle(sq_pos_x, sq_pos_y, sq_size, sq_size, shared.TRANSPARENT)
-        if canvas:is_empty() then
-            canvas.object:remove()
-        else
-            canvas:update_later()
+        if canvas.bitmap[index] ~= shared.TRANSPARENT then
+            canvas.bitmap[index] = shared.TRANSPARENT
+            if canvas:is_empty() then
+                canvas.object:remove()
+            else
+                canvas:update_later()
+            end
         end
     else
-        canvas:rectangle(sq_pos_x, sq_pos_y, sq_size, sq_size, def.color)
-        canvas:update_later()
+        if canvas.bitmap[index] ~= def.color then
+            canvas.bitmap[index] = def.color
+            canvas:update_later()
+        end
     end
 end

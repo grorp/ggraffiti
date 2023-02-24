@@ -108,24 +108,6 @@ function CanvasEntity:update_immediately()
     })
 end
 
-local function clamp(val, min, max)
-    return math.max(min, math.min(val, max))
-end
-
-function CanvasEntity:rectangle(x, y, width, height, color)
-    local x1, y1 =
-        clamp(x, 0, self.bitmap_size.x - 1),
-        clamp(y, 0, self.bitmap_size.y - 1)
-    local x2, y2 =
-        clamp(x + width - 1, 0, self.bitmap_size.x - 1),
-        clamp(y + height - 1, 0, self.bitmap_size.y - 1)
-    for xx = x1, x2 do
-        for yy = y1, y2 do
-            self.bitmap[yy * self.bitmap_size.x + xx + 1] = color
-        end
-    end
-end
-
 function CanvasEntity:is_empty()
     for _, c in ipairs(self.bitmap) do
         if c ~= shared.TRANSPARENT then
