@@ -32,7 +32,7 @@ end
 local function validate_staticdata(data)
     return
         type(data) == "table" and
-        validate_vec3(data.node_pos) and
+        validate_vec3(data.node_offset) and
         validate_vec2(data.size) and
         validate_vec2(data.bitmap_size) and
         type(data.bitmap) == "table" and
@@ -57,7 +57,7 @@ function CanvasEntity:on_activate(staticdata)
             return
         end
 
-        self.node_pos = data.node_pos
+        self.node_offset = vector.copy(data.node_offset) -- add metatable
         self.size = data.size
         self.bitmap_size = data.bitmap_size
         self.bitmap = data.bitmap
@@ -77,7 +77,7 @@ function CanvasEntity:on_activate(staticdata)
 end
 
 function CanvasEntity:setup(node_pos, size)
-    self.node_pos = node_pos
+    self.node_offset = node_pos - self.object:get_pos()
     self.size = size
     self.bitmap_size = {
         x = math.max(math.round(self.size.x / shared.DESIRED_PIXEL_SIZE), 1), -- minimum 1x1 pixels
@@ -119,7 +119,7 @@ end
 
 function CanvasEntity:get_staticdata()
     return minetest.serialize({
-        node_pos = self.node_pos,
+        node_offset = self.node_offset,
         size = self.size,
         bitmap_size = self.bitmap_size,
         bitmap = self.bitmap,
@@ -147,9 +147,11 @@ minetest.register_on_dignode(function(pos, oldnode, digger)
     )
     for _, obj in ipairs(objs) do
         local ent = obj:get_luaentity()
-        if ent and ent.name == "ggraffiti:canvas" and
-                vector.equals(ent.node_pos, pos) then
-            obj:remove()
+        if ent and ent.name == "ggraffiti:canvas" then
+            local node_pos = (obj:get_pos() + ent.node_offset):apply(math.round)
+            if node_pos == pos then
+                obj:remove()
+            end
         end
     end
 end)
