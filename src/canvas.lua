@@ -32,7 +32,8 @@ end
 local function validate_staticdata(data)
     return
         type(data) == "table" and
-        validate_vec3(data.node_offset) and
+        -- allow canvases created with older versions of the mod
+        (data.node_offset == nil or validate_vec3(data.node_offset)) and
         validate_vec2(data.size) and
         validate_vec2(data.bitmap_size) and
         type(data.bitmap) == "table" and
@@ -57,7 +58,9 @@ function CanvasEntity:on_activate(staticdata)
             return
         end
 
-        self.node_offset = vector.copy(data.node_offset) -- add metatable
+        if data.node_offset then
+            self.node_offset = vector.copy(data.node_offset) -- add metatable
+        end
         self.size = data.size
         self.bitmap_size = data.bitmap_size
         self.bitmap = data.bitmap
@@ -147,7 +150,7 @@ minetest.register_on_dignode(function(pos, oldnode, digger)
     )
     for _, obj in ipairs(objs) do
         local ent = obj:get_luaentity()
-        if ent and ent.name == "ggraffiti:canvas" then
+        if ent and ent.name == "ggraffiti:canvas" and ent.node_offset then
             local node_pos = (obj:get_pos() + ent.node_offset):apply(math.round)
             if node_pos == pos then
                 obj:remove()
