@@ -4,6 +4,8 @@ This Minetest mod adds graffiti that lets you paint whatever you want on any nod
 
 <img src="./docpics/screenshot_cdb.png" style="width: 512px;" />
 
+This mod is a Work in Progress.
+
 ## Items
 
 **Graffiti Spray Can**
