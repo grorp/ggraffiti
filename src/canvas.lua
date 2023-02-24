@@ -153,3 +153,21 @@ function shared.update_canvases()
     end
     canvas_update_queue = {}
 end
+
+-- This already seems to cover all important cases.
+-- I intentionally do not remove floating graffiti in on_activate, as I think
+-- that this would only make the behavior even more inconsistent and thus even
+-- more confusing.
+minetest.register_on_dignode(function(pos, oldnode, digger)
+    local objs = minetest.get_objects_in_area(
+        pos - vector.new(4, 4, 4), -- arbitrary
+        pos + vector.new(4, 4, 4)
+    )
+    for _, obj in ipairs(objs) do
+        local ent = obj:get_luaentity()
+        if ent and ent.name == "ggraffiti:canvas" and
+                vector.equals(ent.node_pos, pos) then
+            obj:remove()
+        end
+    end
+end)
