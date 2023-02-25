@@ -139,14 +139,9 @@ rgb_spray_can_change_color_gui = flow.make_gui(function(player, ctx)
         min_w = 8,
         gui.Label { label = "Change Color" },
         gui.HBox {
-            gui.Label { label = minetest.colorize("#f00", "Red"), expand = true, align_h = "left" },
-            gui.Label { label = minetest.colorize("#0f0", "Green"), expand = true, align_h = "left" },
-            gui.Label { label = minetest.colorize("#00f", "Blue"), expand = true, align_h = "left" },
-        },
-        gui.HBox {
             gui.Field {
                 name = "color_r_field",
-                -- label = minetest.colorize("#f00", "Red"),
+                label = minetest.colorize("#f00", "Red"),
                 default = tostring(ctx.color.r),
                 expand = true,
                 on_event = function(player, ctx)
@@ -155,7 +150,7 @@ rgb_spray_can_change_color_gui = flow.make_gui(function(player, ctx)
             },
             gui.Field {
                 name = "color_g_field",
-                -- label = minetest.colorize("#0f0", "Green"),
+                label = minetest.colorize("#0f0", "Green"),
                 default = tostring(ctx.color.g),
                 expand = true,
                 on_event = function(player, ctx)
@@ -164,7 +159,7 @@ rgb_spray_can_change_color_gui = flow.make_gui(function(player, ctx)
             },
             gui.Field {
                 name = "color_b_field",
-                -- label = minetest.colorize("#00f", "Blue"),
+                label = minetest.colorize("#00f", "Blue"),
                 default = tostring(ctx.color.b),
                 expand = true,
                 on_event = function(player, ctx)
