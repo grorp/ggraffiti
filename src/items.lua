@@ -109,11 +109,11 @@ rgb_spray_can_gui = flow.make_gui(function(player, ctx)
                 label = "Change",
                 on_event = function(player, ctx)
                     rgb_spray_can_change_color_gui:show(player, {
-                        color = ctx.color
+                        color = ctx.color,
                     })
                 end,
-            }
-        }
+            },
+        },
     }
 end)
 
@@ -176,33 +176,26 @@ rgb_spray_can_change_color_gui = flow.make_gui(function(player, ctx)
                 expand = true,
                 on_event = function(player, ctx)
                     local item = player:get_wielded_item()
+                    -- verify that we're replacing the correct item
                     if item:get_name() == "ggraffiti:spray_can_rgb" then
                         local meta = item:get_meta()
                         local color = meta_get_color(meta)
-                        if color.r == ctx.color.r and color.g == ctx.color.g and color.b == ctx.color.b then
-                            -- if ctx.form.r then
-                                color.r = ctx.form.color_r_dropdown - 1
-                            -- end
-                            -- if ctx.form.g then
-                                color.g = ctx.form.color_g_dropdown - 1
-                            -- end
-                            -- if ctx.form.b then
-                                color.b = ctx.form.color_b_dropdown - 1
-                            -- end
+                        -- verify that we're *really* replacing the correct item
+                        if color.r == ctx.color.r and color.g == ctx.color.g and
+                                color.b == ctx.color.b then
+                            color.r = ctx.form.color_r_dropdown - 1
+                            color.g = ctx.form.color_g_dropdown - 1
+                            color.b = ctx.form.color_b_dropdown - 1
                             meta_set_color(meta, color)
                             player:set_wielded_item(item)
                             rgb_spray_can_gui:show(player, {
                                 color = color,
                             })
-                        else
-                            rgb_spray_can_change_color_gui:close(player)
                         end
-                    else
-                        rgb_spray_can_change_color_gui:close(player)
                     end
                 end,
-            }
-        }
+            },
+        },
     }
 end)
 
