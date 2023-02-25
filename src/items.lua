@@ -136,9 +136,11 @@ rgb_spray_can_change_color_gui = flow.make_gui(function(player, ctx)
     color_png = minetest.encode_base64(color_png)
 
     return gui.VBox {
-        min_w = 8,
+        padding = 0.4,
+        spacing = 0.4,
         gui.Label { label = "Change Color" },
         gui.HBox {
+            spacing = 0.4,
             gui.Field {
                 name = "color_r_field",
                 label = minetest.colorize("#f00", "Red"),
@@ -174,6 +176,7 @@ rgb_spray_can_change_color_gui = flow.make_gui(function(player, ctx)
             texture_name = "[png:" .. color_png,
         },
         gui.HBox {
+            spacing = 0.4,
             gui.Button {
                 label = "Cancel",
                 expand = true,
