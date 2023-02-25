@@ -178,7 +178,11 @@ rgb_spray_can_change_color_gui = flow.make_gui(function(player, ctx)
                 end,
             },
         },
-        make_color_gui_element(png_color),
+        gui.VBox {
+            spacing = 0,
+            gui.Label { label = S("Preview") },
+            make_color_gui_element(png_color),
+        },
         gui.HBox {
             spacing = 0.4,
             gui.Button {
