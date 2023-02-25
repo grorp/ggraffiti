@@ -111,6 +111,7 @@ rgb_spray_can_gui = flow.make_gui(function(player, ctx)
         gui.label { label = S("RGB Graffiti Spray Can") },
         gui.Label { label = S("Color") },
         gui.HBox {
+            spacing = 0.4,
             make_color_gui_element(ctx.color),
             gui.Label {
                 label = S("R: @1, G: @2, B: @3", ctx.color.r, ctx.color.g, ctx.color.b),
@@ -173,6 +174,7 @@ rgb_spray_can_change_color_gui = flow.make_gui(function(player, ctx)
                 end,
             },
         },
+        gui.Label { label = S("Values must be integers in the range [0..255].") },
         gui.VBox {
             spacing = 0,
             gui.Label { label = S("Preview") },

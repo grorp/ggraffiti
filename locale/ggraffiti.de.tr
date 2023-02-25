@@ -20,7 +20,7 @@ Red Mushroom Extract=Roter Pilzextrakt
 Graffiti Remover Spray Can=Graffiti-Entferner-Sprühdose
 
 RGB Graffiti Spray Can=RGB-Graffiti-Sprühdose
-
+R: @1, G: @2, B: @3=R: @1, G: @2, B: @3
 Color=Farbe
 Change=Ändern
 
@@ -28,6 +28,7 @@ Change color=Farbe ändern
 R (Red)=R (Rot)
 G (Green)=G (Grün)
 B (Blue)= B (Blau)
+Values must be integers in the range [0..255].=Werte müssen ganze Zahlen im Bereich [0..255] sein.
 Preview=Vorschau
 Cancel=Abbrechen
 Update preview / Save=Vorschau aktualisieren / Speichern
