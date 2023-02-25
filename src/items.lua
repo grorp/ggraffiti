@@ -92,16 +92,38 @@ local gui = flow.widgets
 local rgb_spray_can_gui
 local rgb_spray_can_change_color_gui
 
+local function make_color_gui_element(color)
+    local color_png = minetest.encode_png(1, 1, { color }, 9)
+    color_png = minetest.encode_base64(color_png)
+    return gui.Image {
+        w = 0.8,
+        h = 0.8,
+        align_h = "fill",
+        texture_name = "[png:" .. color_png,
+    }
+end
+
+
 rgb_spray_can_gui = flow.make_gui(function(player, ctx)
     return gui.VBox {
         min_w = 8,
-        gui.Label { label = "Color" },
+        padding = 0.4,
+        spacing = 0.4,
+        gui.label { label = S("RGB Graffiti Spray Can") },
+        gui.Label { label = S("Color") },
         gui.HBox {
-            gui.Label { label = "R: " ..  ctx.color.r },
-            gui.Label { label = "G: " .. ctx.color.g },
-            gui.Label { label = "B: " .. ctx.color.b, expand = true, align_h = "left" },
+            gui.VBox {
+                gui.Label {
+                    label = minetest.colorize("#f00", S("Red")) .. ": " .. ctx.color.r .. ", " ..
+                        minetest.colorize("#0f0", S("Green")) .. ": " .. ctx.color.g .. ", " ..
+                        minetest.colorize("#00f", S("Blue")) .. ": " .. ctx.color.b,
+                    expand = true,
+                    align_h = "left",
+                },
+                make_color_gui_element(ctx.color),
+            },
             gui.Button {
-                label = "Change",
+                label = S("Change"),
                 on_event = function(player, ctx)
                     rgb_spray_can_change_color_gui:show(player, {
                         color = ctx.color,
@@ -121,8 +143,6 @@ rgb_spray_can_change_color_gui = flow.make_gui(function(player, ctx)
         g = ctx.form.g_field and tonumber(ctx.form.g_field) or ctx.color.g,
         b = ctx.form.b_field and tonumber(ctx.form.b_field) or ctx.color.b,
     }
-    local color_png = minetest.encode_png(1, 1, { png_color }, 9)
-    color_png = minetest.encode_base64(color_png)
 
     return gui.VBox {
         padding = 0.4,
@@ -158,12 +178,7 @@ rgb_spray_can_change_color_gui = flow.make_gui(function(player, ctx)
                 end,
             },
         },
-        gui.Image {
-            w = 0.8,
-            h = 0.8,
-            align_h = "fill",
-            texture_name = "[png:" .. color_png,
-        },
+        make_color_gui_element(png_color),
         gui.HBox {
             spacing = 0.4,
             gui.Button {

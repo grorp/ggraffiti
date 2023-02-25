@@ -19,9 +19,14 @@ Graffiti Spray Can (pink)=Graffiti-Sprühdose (rosa)
 Red Mushroom Extract=Roter Pilzextrakt
 Graffiti Remover Spray Can=Graffiti-Entferner-Sprühdose
 
-Change color=Farbe ändern
+RGB Graffiti Spray Can=RGB-Graffiti-Sprühdose
+
+Color=Farbe
 Red=Rot
 Green=Grün
 Blue=Blau
+Change=Ändern
+
+Change color=Farbe ändern
 Cancel=Abbrechen
 Update preview / Save=Vorschau aktualisieren / Speichern
