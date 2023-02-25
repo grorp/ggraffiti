@@ -153,7 +153,13 @@ rgb_spray_can_change_color_gui = flow.make_gui(function(player, ctx)
             w = 0.8,
             h = 0.8,
             align_h = "fill",
-            texture_name = "air.png",
+            texture_name = "[png:" .. minetest.encode_base64(
+                minetest.encode_png(1, 1, {{
+                    r = ctx.form.color_r_dropdown and (ctx.form.color_r_dropdown - 1) or ctx.color.r,
+                    g = ctx.form.color_g_dropdown and (ctx.form.color_g_dropdown - 1) or ctx.color.g,
+                    b = ctx.form.color_b_dropdown and (ctx.form.color_b_dropdown - 1) or ctx.color.b,
+                }}, 9)
+            ),
         },
         gui.HBox {
             gui.Button {
