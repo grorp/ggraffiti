@@ -125,9 +125,9 @@ end
 
 rgb_spray_can_change_color_gui = flow.make_gui(function(player, ctx)
     local png_color = {
-        r = ctx.form.color_r_dropdown and (ctx.form.color_r_dropdown - 1) or ctx.color.r,
-        g = ctx.form.color_g_dropdown and (ctx.form.color_g_dropdown - 1) or ctx.color.g,
-        b = ctx.form.color_b_dropdown and (ctx.form.color_b_dropdown - 1) or ctx.color.b,
+        r = ctx.form.color_r_field and tonumber(ctx.form.color_r_field) or ctx.color.r,
+        g = ctx.form.color_g_field and tonumber(ctx.form.color_g_field) or ctx.color.g,
+        b = ctx.form.color_b_field and tonumber(ctx.form.color_b_field) or ctx.color.b,
     }
     local color_png = minetest.encode_png(1, 1, { png_color }, 9)
     color_png = minetest.encode_base64(color_png)
