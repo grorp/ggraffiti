@@ -148,6 +148,7 @@ rgb_spray_can_change_color_gui = flow.make_gui(function(player, ctx)
                 expand = true,
                 on_event = function(player, ctx)
                     ctx.form.color_r_field = adjust_input_val(ctx.form.color_r_field)
+                    ctx.prev_color_r_field = ctx.form.color_r_field
                     return true
                 end,
             },
@@ -158,6 +159,7 @@ rgb_spray_can_change_color_gui = flow.make_gui(function(player, ctx)
                 expand = true,
                 on_event = function(player, ctx)
                     ctx.form.color_g_field = adjust_input_val(ctx.form.color_g_field)
+                    ctx.prev_color_g_field = ctx.form.color_g_field
                     return true
                 end,
             },
@@ -168,6 +170,7 @@ rgb_spray_can_change_color_gui = flow.make_gui(function(player, ctx)
                 expand = true,
                 on_event = function(player, ctx)
                     ctx.form.color_b_field = adjust_input_val(ctx.form.color_b_field)
+                    ctx.prev_color_b_field = ctx.form.color_b_field
                     return true
                 end,
             },
@@ -192,6 +195,14 @@ rgb_spray_can_change_color_gui = flow.make_gui(function(player, ctx)
                 label = "Save",
                 expand = true,
                 on_event = function(player, ctx)
+                    print("previous color b field: " .. dump(ctx.prev_color_b_field))
+                    print("now color b field: " .. dump(ctx.form.color_b_field))
+                    if ctx.form.color_r_field ~= ctx.prev_color_r_field or
+                            ctx.form.color_g_field ~= ctx.prev_color_g_field or
+                            ctx.form.color_b_field ~= ctx.prev_color_b_field then
+                        return
+                    end
+
                     local item = player:get_wielded_item()
                     -- verify that we're replacing the correct item
                     if item:get_name() == "ggraffiti:spray_can_rgb" then
