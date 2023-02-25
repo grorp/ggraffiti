@@ -212,6 +212,14 @@ end)
 
 minetest.register_globalstep(function()
     for player, ctx in pairs(players_for_update) do
+        ctx.prev_color_r_field = ctx.prev_color_r_field or tostring(ctx.color.r)
+        ctx.prev_color_g_field = ctx.prev_color_g_field or tostring(ctx.color.g)
+        ctx.prev_color_b_field = ctx.prev_color_b_field or tostring(ctx.color.b)
+        local fields_have_changed =
+            ctx.form.color_r_field ~= ctx.prev_color_r_field or
+            ctx.form.color_g_field ~= ctx.prev_color_g_field or
+            ctx.form.color_b_field ~= ctx.prev_color_b_field
+
         ctx.form.color_r_field = adjust_input_val(ctx.form.color_r_field)
         ctx.form.color_g_field = adjust_input_val(ctx.form.color_g_field)
         ctx.form.color_b_field = adjust_input_val(ctx.form.color_b_field)
@@ -219,7 +227,7 @@ minetest.register_globalstep(function()
         ctx.prev_color_g_field = ctx.form.color_g_field
         ctx.prev_color_b_field = ctx.form.color_b_field
 
-        if players_for_save[player] then
+        if players_for_save[player] and not fields_have_changed then
             local item = player:get_wielded_item()
             -- verify that we're replacing the correct item
             if item:get_name() == "ggraffiti:spray_can_rgb" then
