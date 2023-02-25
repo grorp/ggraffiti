@@ -22,12 +22,12 @@ Graffiti Remover Spray Can=Graffiti-Entferner-Sprühdose
 RGB Graffiti Spray Can=RGB-Graffiti-Sprühdose
 
 Color=Farbe
-Red=Rot
-Green=Grün
-Blue=Blau
 Change=Ändern
 
 Change color=Farbe ändern
+R (Red)=R (Rot)
+G (Green)=G (Grün)
+B (Blue)= B (Blau)
 Preview=Vorschau
 Cancel=Abbrechen
 Update preview / Save=Vorschau aktualisieren / Speichern

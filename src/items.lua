@@ -103,7 +103,6 @@ local function make_color_gui_element(color)
     }
 end
 
-
 rgb_spray_can_gui = flow.make_gui(function(player, ctx)
     return gui.VBox {
         min_w = 8,
@@ -112,15 +111,11 @@ rgb_spray_can_gui = flow.make_gui(function(player, ctx)
         gui.label { label = S("RGB Graffiti Spray Can") },
         gui.Label { label = S("Color") },
         gui.HBox {
-            gui.VBox {
-                gui.Label {
-                    label = minetest.colorize("#f00", S("Red")) .. ": " .. ctx.color.r .. ", " ..
-                        minetest.colorize("#0f0", S("Green")) .. ": " .. ctx.color.g .. ", " ..
-                        minetest.colorize("#00f", S("Blue")) .. ": " .. ctx.color.b,
-                    expand = true,
-                    align_h = "left",
-                },
-                make_color_gui_element(ctx.color),
+            make_color_gui_element(ctx.color),
+            gui.Label {
+                label = S("R: @1, G: @2, B: @3", ctx.color.r, ctx.color.g, ctx.color.b),
+                expand = true,
+                align_h = "left",
             },
             gui.Button {
                 label = S("Change"),
@@ -152,7 +147,7 @@ rgb_spray_can_change_color_gui = flow.make_gui(function(player, ctx)
             spacing = 0.4,
             gui.Field {
                 name = "r_field",
-                label = minetest.colorize("#f00", S("Red")),
+                label = minetest.colorize("#f00", S("R (Red)")),
                 default = tostring(ctx.color.r),
                 expand = true,
                 on_event = function(player, ctx)
@@ -161,7 +156,7 @@ rgb_spray_can_change_color_gui = flow.make_gui(function(player, ctx)
             },
             gui.Field {
                 name = "g_field",
-                label = minetest.colorize("#0f0", S("Green")),
+                label = minetest.colorize("#0f0", S("G (Green)")),
                 default = tostring(ctx.color.g),
                 expand = true,
                 on_event = function(player, ctx)
@@ -170,7 +165,7 @@ rgb_spray_can_change_color_gui = flow.make_gui(function(player, ctx)
             },
             gui.Field {
                 name = "b_field",
-                label = minetest.colorize("#00f", S("Blue")),
+                label = minetest.colorize("#00f", S("B (Blue)")),
                 default = tostring(ctx.color.b),
                 expand = true,
                 on_event = function(player, ctx)
