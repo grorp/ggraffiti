@@ -149,6 +149,12 @@ rgb_spray_can_change_color_gui = flow.make_gui(function(player, ctx)
                 expand = true,
             },
         },
+        gui.Image {
+            w = 0.8,
+            h = 0.8,
+            align_h = "fill",
+            texture_name = "air.png",
+        },
         gui.HBox {
             gui.Button {
                 label = "Cancel",
