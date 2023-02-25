@@ -75,6 +75,129 @@ for _, dye in ipairs(dye.dyes) do
     })
 end
 
+local colors_dropdown_vals = {}
+for i = 0, 255 do
+    table.insert(colors_dropdown_vals, tostring(i))
+end
+
+local gui = flow.widgets
+
+local my_gui = flow.make_gui(function(player, ctx)
+    return gui.VBox {
+        min_w = 8,
+        spacing = 0.4,
+        gui.Label {label = "Change Color"},
+        gui.HBox {
+            spacing = 0.4,
+            gui.HBox {
+                expand = true,
+                spacing = 0.1,
+                gui.Label { label = "R:" },
+                gui.Dropdown {
+                    name = "color_r_dropdown",
+                    items = colors_dropdown_vals,
+                    index_event = true,
+                    expand = true,
+                },
+            },
+            gui.HBox {
+                expand = true,
+                spacing = 0.1,
+                gui.Label { label = "G:" },
+                gui.Dropdown {
+                    name = "color_g_dropdown",
+                    items = colors_dropdown_vals,
+                    index_event = true,
+                    expand = true,
+                },
+            },
+            gui.HBox {
+                expand = true,
+                spacing = 0.1,
+                gui.Label { label = "B:" },
+                gui.Dropdown {
+                    name = "color_b_dropdown",
+                    items = colors_dropdown_vals,
+                    index_event = true,
+                    expand = true,
+                },
+            },
+        },
+        gui.HBox {
+            gui.Button {
+                label = "Cancel",
+                on_event = function(player, ctx)
+                    -- flow should guarantee that `ctx.form.my_dropdown` exists, even if the client doesn't send my_dropdown to the server.
+                    local selected_idx = ctx.form.color_r_dropdown
+                    minetest.chat_send_player(player:get_player_name(), "You have selected item #" .. selected_idx .. "!")
+                end,
+                expand = true,
+            },
+            gui.Button {
+                label = "Save",
+                on_event = function(player, ctx)
+                    -- flow should guarantee that `ctx.form.my_dropdown` exists, even if the client doesn't send my_dropdown to the server.
+                    local selected_idx = ctx.form.color_r_dropdown
+                    minetest.chat_send_player(player:get_player_name(), "You have selected item #" .. selected_idx .. "!")
+                end,
+                expand = true,
+            }
+        }
+    }
+end)
+
+local function rgb_spray_can_on_place(item, player, pointed_thing)
+    local meta = item:get_meta()
+    local color = minetest.deserialize(meta:get_string("ggraffiti_color"))
+    if not color then
+        color = { r = 0, g = 0, b = 0 }
+    end
+    local my_other_gui
+    my_other_gui = flow.make_gui(function(player, ctx)
+        return gui.VBox {
+            min_w = 8,
+            gui.Label { label = "Color" },
+            gui.HBox {
+                gui.HBox {
+                    spacing = 0.2,
+                    gui.Label {
+                        label = "R: " ..  color.r
+                    },
+                    gui.Label {
+                        label = "G: " .. color.g
+                    },
+                    gui.Label {
+                        label = "B: " .. color.b
+                    },
+                    expand = true, align_h = "left",
+                },
+                gui.Button {
+                    label = "Change",
+                    on_event = function(player, ctx)
+                        my_gui:show(player)
+                    end,
+                }
+            }
+        }
+    end)
+    my_other_gui:show(player)
+end
+
+minetest.register_tool("ggraffiti:spray_can_rgb", {
+    description = S("RGB Graffiti Spray Can"),
+    inventory_image = "ggraffiti_spray_can.png",
+
+    range = shared.MAX_SPRAY_DISTANCE,
+    on_use = spray_can_on_use,
+    _ggraffiti_spray_can = {
+        color = "#f0f0f0",
+    },
+    on_place = rgb_spray_can_on_place,
+    on_secondary_use = rgb_spray_can_on_place,
+
+    groups = {ggraffiti_spray_can = 1},
+})
+
 minetest.register_craftitem("ggraffiti:mushroom_red_extract", {
     description = S("Red Mushroom Extract"),
     inventory_image = "ggraffiti_mushroom_red_extract.png",
