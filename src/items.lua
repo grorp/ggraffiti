@@ -135,25 +135,22 @@ rgb_spray_can_change_color_gui = flow.make_gui(function(player, ctx)
             gui.Label { label = minetest.colorize("#00f", "Blue"), expand = true, align_h = "left" },
         },
         gui.HBox {
-            gui.Dropdown {
-                name = "color_r_dropdown",
-                items = colors_dropdown_vals,
-                selected_idx = ctx.color.r + 1,
-                index_event = true,
+            gui.Field {
+                name = "color_r_field",
+                -- label = minetest.colorize("#f00", "Red"),
+                default = tostring(ctx.color.r),
                 expand = true,
             },
-            gui.Dropdown {
-                name = "color_g_dropdown",
-                items = colors_dropdown_vals,
-                selected_idx = ctx.color.g + 1,
-                index_event = true,
+            gui.Field {
+                name = "color_g_field",
+                -- label = minetest.colorize("#0f0", "Green"),
+                default = tostring(ctx.color.g),
                 expand = true,
             },
-            gui.Dropdown {
-                name = "color_b_dropdown",
-                items = colors_dropdown_vals,
-                selected_idx = ctx.color.b + 1,
-                index_event = true,
+            gui.Field {
+                name = "color_b_field",
+                -- label = minetest.colorize("#00f", "Blue"),
+                default = tostring(ctx.color.b),
                 expand = true,
             },
         },
