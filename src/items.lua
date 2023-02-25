@@ -151,10 +151,6 @@ rgb_spray_can_change_color_gui = flow.make_gui(function(player, ctx)
                 expand = true,
                 on_event = function(player, ctx)
                     players_for_update[player] = ctx
-                    print("red input callback")
-                    ctx.form.color_r_field = adjust_input_val(ctx.form.color_r_field)
-                    ctx.color_r_field_adjusted = true
-                    return true
                 end,
             },
             gui.Field {
@@ -164,9 +160,6 @@ rgb_spray_can_change_color_gui = flow.make_gui(function(player, ctx)
                 expand = true,
                 on_event = function(player, ctx)
                     players_for_update[player] = ctx
-                    print("green input callback")
-                    ctx.form.color_g_field = adjust_input_val(ctx.form.color_g_field)
-                    return true
                 end,
             },
             gui.Field {
@@ -176,9 +169,6 @@ rgb_spray_can_change_color_gui = flow.make_gui(function(player, ctx)
                 expand = true,
                 on_event = function(player, ctx)
                     players_for_update[player] = ctx
-                    print("blue input callback")
-                    ctx.form.color_b_field = adjust_input_val(ctx.form.color_b_field)
-                    return true
                 end,
             },
         },
@@ -199,7 +189,7 @@ rgb_spray_can_change_color_gui = flow.make_gui(function(player, ctx)
                 end,
             },
             gui.Button {
-                label = "Save",
+                label = "Update Preview / Save",
                 expand = true,
                 on_event = function(player, ctx)
                     players_for_update[player] = ctx
