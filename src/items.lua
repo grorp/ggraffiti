@@ -120,45 +120,33 @@ end)
 rgb_spray_can_change_color_gui = flow.make_gui(function(player, ctx)
     return gui.VBox {
         min_w = 8,
-        spacing = 0.4,
         gui.Label { label = "Change Color" },
         gui.HBox {
-            spacing = 0.4,
-            gui.HBox {
-                spacing = 0.1,
+            gui.Label { label = minetest.colorize("#f00", "Red"), expand = true, align_h = "left" },
+            gui.Label { label = minetest.colorize("#0f0", "Green"), expand = true, align_h = "left" },
+            gui.Label { label = minetest.colorize("#00f", "Blue"), expand = true, align_h = "left" },
+        },
+        gui.HBox {
+            gui.Dropdown {
+                name = "color_r_dropdown",
+                items = colors_dropdown_vals,
+                selected_idx = ctx.color.r + 1,
+                index_event = true,
                 expand = true,
-                gui.Label { label = "R:" },
-                gui.Dropdown {
-                    name = "color_r_dropdown",
-                    items = colors_dropdown_vals,
-                    selected_idx = ctx.color.r + 1,
-                    index_event = true,
-                    expand = true,
-                },
             },
-            gui.HBox {
-                spacing = 0.1,
+            gui.Dropdown {
+                name = "color_g_dropdown",
+                items = colors_dropdown_vals,
+                selected_idx = ctx.color.g + 1,
+                index_event = true,
                 expand = true,
-                gui.Label { label = "G:" },
-                gui.Dropdown {
-                    name = "color_g_dropdown",
-                    items = colors_dropdown_vals,
-                    selected_idx = ctx.color.g + 1,
-                    index_event = true,
-                    expand = true,
-                },
             },
-            gui.HBox {
-                spacing = 0.1,
+            gui.Dropdown {
+                name = "color_b_dropdown",
+                items = colors_dropdown_vals,
+                selected_idx = ctx.color.b + 1,
+                index_event = true,
                 expand = true,
-                gui.Label { label = "B:" },
-                gui.Dropdown {
-                    name = "color_b_dropdown",
-                    items = colors_dropdown_vals,
-                    selected_idx = ctx.color.b + 1,
-                    index_event = true,
-                    expand = true,
-                },
             },
         },
         gui.HBox {
