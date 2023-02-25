@@ -251,17 +251,12 @@ local function global_update_form(player, ctx)
 end
 
 minetest.register_globalstep(function()
-    for player_name in pairs(players_to_update) do
-        local player = minetest.get_player_by_name(player_name)
-        if player then
-            rgb_spray_can_change_color_gui:update_where(function(iplayer, ictx)
-                if iplayer == player then
-                    return global_update_form(iplayer, ictx)
-                end
-                return false
-            end)
+    rgb_spray_can_change_color_gui:update_where(function(player, ctx)
+        if players_to_update[player:get_player_name()] then
+            return global_update_form(player, ctx)
         end
-    end
+        return false
+    end)
     players_to_update = {}
     players_to_save = {}
 end)
