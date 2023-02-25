@@ -147,7 +147,7 @@ rgb_spray_can_change_color_gui = flow.make_gui(function(player, ctx)
                 default = tostring(ctx.color.r),
                 expand = true,
                 on_event = function(player, ctx)
-                    players_for_update[player] = ctx
+                    players_for_update[player:get_player_name()] = true
                 end,
             },
             gui.Field {
@@ -156,7 +156,7 @@ rgb_spray_can_change_color_gui = flow.make_gui(function(player, ctx)
                 default = tostring(ctx.color.g),
                 expand = true,
                 on_event = function(player, ctx)
-                    players_for_update[player] = ctx
+                    players_for_update[player:get_player_name()] = true
                 end,
             },
             gui.Field {
@@ -165,7 +165,7 @@ rgb_spray_can_change_color_gui = flow.make_gui(function(player, ctx)
                 default = tostring(ctx.color.b),
                 expand = true,
                 on_event = function(player, ctx)
-                    players_for_update[player] = ctx
+                    players_for_update[player:get_player_name()] = true
                 end,
             },
         },
@@ -190,57 +190,67 @@ rgb_spray_can_change_color_gui = flow.make_gui(function(player, ctx)
                 label = S("Update preview / Save"),
                 expand = true,
                 on_event = function(player, ctx)
-                    players_for_update[player] = ctx
-                    players_for_save[player] = true
+                    players_for_update[player:get_player_name()] = true
+                    players_for_save[player:get_player_name()] = true
                 end,
             },
         },
     }
 end)
 
-minetest.register_globalstep(function()
-    for player, ctx in pairs(players_for_update) do
-        ctx.prev_color_r_field = ctx.prev_color_r_field or tostring(ctx.color.r)
-        ctx.prev_color_g_field = ctx.prev_color_g_field or tostring(ctx.color.g)
-        ctx.prev_color_b_field = ctx.prev_color_b_field or tostring(ctx.color.b)
-        local fields_have_changed =
-            ctx.form.color_r_field ~= ctx.prev_color_r_field or
-            ctx.form.color_g_field ~= ctx.prev_color_g_field or
-            ctx.form.color_b_field ~= ctx.prev_color_b_field
+local function global_update_form(player, ctx)
+    ctx.prev_color_r_field = ctx.prev_color_r_field or tostring(ctx.color.r)
+    ctx.prev_color_g_field = ctx.prev_color_g_field or tostring(ctx.color.g)
+    ctx.prev_color_b_field = ctx.prev_color_b_field or tostring(ctx.color.b)
+    local fields_have_changed =
+        ctx.form.color_r_field ~= ctx.prev_color_r_field or
+        ctx.form.color_g_field ~= ctx.prev_color_g_field or
+        ctx.form.color_b_field ~= ctx.prev_color_b_field
 
-        ctx.form.color_r_field = adjust_input_val(ctx.form.color_r_field)
-        ctx.form.color_g_field = adjust_input_val(ctx.form.color_g_field)
-        ctx.form.color_b_field = adjust_input_val(ctx.form.color_b_field)
-        ctx.prev_color_r_field = ctx.form.color_r_field
-        ctx.prev_color_g_field = ctx.form.color_g_field
-        ctx.prev_color_b_field = ctx.form.color_b_field
+    ctx.form.color_r_field = adjust_input_val(ctx.form.color_r_field)
+    ctx.form.color_g_field = adjust_input_val(ctx.form.color_g_field)
+    ctx.form.color_b_field = adjust_input_val(ctx.form.color_b_field)
+    ctx.prev_color_r_field = ctx.form.color_r_field
+    ctx.prev_color_g_field = ctx.form.color_g_field
+    ctx.prev_color_b_field = ctx.form.color_b_field
 
-        if players_for_save[player] and not fields_have_changed then
-            local item = player:get_wielded_item()
-            -- verify that we're replacing the correct item
-            if item:get_name() == "ggraffiti:spray_can_rgb" then
-                local meta = item:get_meta()
-                local color = meta_get_color(meta)
-                -- verify that we're *really* replacing the correct item
-                if color.r == ctx.color.r and color.g == ctx.color.g and
-                        color.b == ctx.color.b then
-                    color.r = tonumber(ctx.form.color_r_field)
-                    color.g = tonumber(ctx.form.color_g_field)
-                    color.b = tonumber(ctx.form.color_b_field)
-                    meta_set_color(meta, color)
-                    player:set_wielded_item(item)
-                    rgb_spray_can_gui:show(player, {
-                        color = color,
-                    })
-                end
+    if players_for_save[player:get_player_name()] and not fields_have_changed then
+        local item = player:get_wielded_item()
+        -- verify that we're replacing the correct item
+        if item:get_name() == "ggraffiti:spray_can_rgb" then
+            local meta = item:get_meta()
+            local color = meta_get_color(meta)
+            -- verify that we're *really* replacing the correct item
+            if color.r == ctx.color.r and color.g == ctx.color.g and
+                    color.b == ctx.color.b then
+                color.r = tonumber(ctx.form.color_r_field)
+                color.g = tonumber(ctx.form.color_g_field)
+                color.b = tonumber(ctx.form.color_b_field)
+                meta_set_color(meta, color)
+                player:set_wielded_item(item)
+                rgb_spray_can_gui:show(player, {
+                    color = color,
+                })
             end
-        else
+        end
+        return false
+    else
+        return true -- update the form
+    end
+end
+
+minetest.register_globalstep(function()
+    for player_name in pairs(players_for_update) do
+        local player = minetest.get_player_by_name(player_name)
+        if player then
             rgb_spray_can_change_color_gui:update_where(function(iplayer, ictx)
-                return iplayer == player
+                if iplayer == player then
+                    return global_update_form(iplayer, ictx)
+                end
+                return false
             end)
         end
     end
-
     players_for_update = {}
     players_for_save = {}
 end)
