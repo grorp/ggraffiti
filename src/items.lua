@@ -195,32 +195,30 @@ rgb_spray_can_change_color_gui = flow.make_gui(function(player, ctx)
                 label = "Save",
                 expand = true,
                 on_event = function(player, ctx)
-                    print("save button callback")
-                    -- tonumber(ctx.form.color_r_field)
-                    -- tonumber(ctx.form.color_g_field)
-                    -- tonumber(ctx.form.color_b_field)
-                    -- ctx.form.color_r_field = adjust_input_val(ctx.form.color_r_field)
-                    -- ctx.form.color_g_field = adjust_input_val(ctx.form.color_g_field)
-                    -- ctx.form.color_b_field = adjust_input_val(ctx.form.color_b_field)
+                    -- This has to be done again here as Flow doesn't always call
+                    -- this callback after the others.
+                    ctx.form.color_r_field = adjust_input_val(ctx.form.color_r_field)
+                    ctx.form.color_g_field = adjust_input_val(ctx.form.color_g_field)
+                    ctx.form.color_b_field = adjust_input_val(ctx.form.color_b_field)
 
-                    -- local item = player:get_wielded_item()
+                    local item = player:get_wielded_item()
                     -- verify that we're replacing the correct item
-                    -- if item:get_name() == "ggraffiti:spray_can_rgb" then
-                    --     local meta = item:get_meta()
-                    --     local color = meta_get_color(meta)
-                    --     -- verify that we're *really* replacing the correct item
-                    --     if color.r == ctx.color.r and color.g == ctx.color.g and
-                    --             color.b == ctx.color.b then
-                    --         color.r = ctx.form.color_r_dropdown - 1
-                    --         color.g = ctx.form.color_g_dropdown - 1
-                    --         color.b = ctx.form.color_b_dropdown - 1
-                    --         meta_set_color(meta, color)
-                    --         player:set_wielded_item(item)
-                    --         rgb_spray_can_gui:show(player, {
-                    --             color = color,
-                    --         })
-                    --     end
-                    -- end
+                    if item:get_name() == "ggraffiti:spray_can_rgb" then
+                        local meta = item:get_meta()
+                        local color = meta_get_color(meta)
+                        -- verify that we're *really* replacing the correct item
+                        if color.r == ctx.color.r and color.g == ctx.color.g and
+                                color.b == ctx.color.b then
+                            color.r = tonumber(ctx.form.color_r_field)
+                            color.g = tonumber(ctx.form.color_g_field)
+                            color.b = tonumber(ctx.form.color_b_field)
+                            meta_set_color(meta, color)
+                            player:set_wielded_item(item)
+                            rgb_spray_can_gui:show(player, {
+                                color = color,
+                            })
+                        end
+                    end
                 end,
             },
         },
