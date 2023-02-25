@@ -80,44 +80,82 @@ for i = 0, 255 do
     table.insert(colors_dropdown_vals, tostring(i))
 end
 
+local function meta_get_color(meta)
+    local color = minetest.deserialize(meta:get_string("ggraffiti_color"))
+    if not color then
+        color = { r = 0, g = 0, b = 0 }
+    end
+    return color
+end
+
+local function meta_set_color(meta, color)
+    meta:set_string("ggraffiti_color", minetest.serialize(color))
+end
+
 local gui = flow.widgets
 
-local my_gui = flow.make_gui(function(player, ctx)
+local rgb_spray_can_gui
+local rgb_spray_can_change_color_gui
+
+rgb_spray_can_gui = flow.make_gui(function(player, ctx)
+    return gui.VBox {
+        min_w = 8,
+        gui.Label { label = "Color" },
+        gui.HBox {
+            gui.Label { label = "R: " ..  ctx.color.r },
+            gui.Label { label = "G: " .. ctx.color.g },
+            gui.Label { label = "B: " .. ctx.color.b, expand = true, align_h = "left" },
+            gui.Button {
+                label = "Change",
+                on_event = function(player, ctx)
+                    rgb_spray_can_change_color_gui:show(player, {
+                        color = ctx.color
+                    })
+                end,
+            }
+        }
+    }
+end)
+
+rgb_spray_can_change_color_gui = flow.make_gui(function(player, ctx)
     return gui.VBox {
         min_w = 8,
         spacing = 0.4,
-        gui.Label {label = "Change Color"},
+        gui.Label { label = "Change Color" },
         gui.HBox {
             spacing = 0.4,
             gui.HBox {
-                expand = true,
                 spacing = 0.1,
+                expand = true,
                 gui.Label { label = "R:" },
                 gui.Dropdown {
                     name = "color_r_dropdown",
                     items = colors_dropdown_vals,
+                    selected_idx = ctx.color.r + 1,
                     index_event = true,
                     expand = true,
                 },
             },
             gui.HBox {
-                expand = true,
                 spacing = 0.1,
+                expand = true,
                 gui.Label { label = "G:" },
                 gui.Dropdown {
                     name = "color_g_dropdown",
                     items = colors_dropdown_vals,
+                    selected_idx = ctx.color.g + 1,
                     index_event = true,
                     expand = true,
                 },
             },
             gui.HBox {
-                expand = true,
                 spacing = 0.1,
+                expand = true,
                 gui.Label { label = "B:" },
                 gui.Dropdown {
                     name = "color_b_dropdown",
                     items = colors_dropdown_vals,
+                    selected_idx = ctx.color.b + 1,
                     index_event = true,
                     expand = true,
                 },
@@ -126,21 +164,43 @@ local my_gui = flow.make_gui(function(player, ctx)
         gui.HBox {
             gui.Button {
                 label = "Cancel",
-                on_event = function(player, ctx)
-                    -- flow should guarantee that `ctx.form.my_dropdown` exists, even if the client doesn't send my_dropdown to the server.
-                    local selected_idx = ctx.form.color_r_dropdown
-                    minetest.chat_send_player(player:get_player_name(), "You have selected item #" .. selected_idx .. "!")
-                end,
                 expand = true,
+                on_event = function(player, ctx)
+                    rgb_spray_can_gui:show(player, {
+                        color = ctx.color,
+                    })
+                end,
             },
             gui.Button {
                 label = "Save",
-                on_event = function(player, ctx)
-                    -- flow should guarantee that `ctx.form.my_dropdown` exists, even if the client doesn't send my_dropdown to the server.
-                    local selected_idx = ctx.form.color_r_dropdown
-                    minetest.chat_send_player(player:get_player_name(), "You have selected item #" .. selected_idx .. "!")
-                end,
                 expand = true,
+                on_event = function(player, ctx)
+                    local item = player:get_wielded_item()
+                    if item:get_name() == "ggraffiti:spray_can_rgb" then
+                        local meta = item:get_meta()
+                        local color = meta_get_color(meta)
+                        if color.r == ctx.color.r and color.g == ctx.color.g and color.b == ctx.color.b then
+                            -- if ctx.form.r then
+                                color.r = ctx.form.color_r_dropdown - 1
+                            -- end
+                            -- if ctx.form.g then
+                                color.g = ctx.form.color_g_dropdown - 1
+                            -- end
+                            -- if ctx.form.b then
+                                color.b = ctx.form.color_b_dropdown - 1
+                            -- end
+                            meta_set_color(meta, color)
+                            player:set_wielded_item(item)
+                            rgb_spray_can_gui:show(player, {
+                                color = color,
+                            })
+                        else
+                            rgb_spray_can_change_color_gui:close(player)
+                        end
+                    else
+                        rgb_spray_can_change_color_gui:close(player)
+                    end
+                end,
             }
         }
     }
@@ -148,39 +208,10 @@ end)
 
 local function rgb_spray_can_on_place(item, player, pointed_thing)
     local meta = item:get_meta()
-    local color = minetest.deserialize(meta:get_string("ggraffiti_color"))
-    if not color then
-        color = { r = 0, g = 0, b = 0 }
-    end
-    local my_other_gui
-    my_other_gui = flow.make_gui(function(player, ctx)
-        return gui.VBox {
-            min_w = 8,
-            gui.Label { label = "Color" },
-            gui.HBox {
-                gui.HBox {
-                    spacing = 0.2,
-                    gui.Label {
-                        label = "R: " ..  color.r
-                    },
-                    gui.Label {
-                        label = "G: " .. color.g
-                    },
-                    gui.Label {
-                        label = "B: " .. color.b
-                    },
-                    expand = true, align_h = "left",
-                },
-                gui.Button {
-                    label = "Change",
-                    on_event = function(player, ctx)
-                        my_gui:show(player)
-                    end,
-                }
-            }
-        }
-    end)
-    my_other_gui:show(player)
+    local color = meta_get_color(meta)
+    rgb_spray_can_gui:show(player, {
+        color = color,
+    })
 end
 
 minetest.register_tool("ggraffiti:spray_can_rgb", {
