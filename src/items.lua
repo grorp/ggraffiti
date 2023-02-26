@@ -138,6 +138,17 @@ local function adjust_field_value(val)
 end
 
 rgb_spray_can_change_color_gui = flow.make_gui(function(player, ctx)
+    local has_input_color = not not (ctx.form.field_r and ctx.form.field_g and ctx.form.field_b)
+    local has_default_color = not ctx.initial_setup
+    local png_color
+    if has_input_color or has_default_color then
+        png_color = {
+            r = has_input_color and tonumber(ctx.form.field_r) or ctx.color.r,
+            g = has_input_color and tonumber(ctx.form.field_g) or ctx.color.r,
+            b = has_input_color and tonumber(ctx.form.field_b) or ctx.color.r,
+        }
+    end
+
     return gui.VBox {
         min_w = 20,
         padding = 0.4,
@@ -186,6 +197,13 @@ rgb_spray_can_change_color_gui = flow.make_gui(function(player, ctx)
             gui.Label { label = ServerS(player, "Preview") },
             gui.HBox {
                 spacing = 0.4,
+                not png_color and gui.Spacer {} or gui.Image {
+                    w = 0.8,
+                    h = 0.8,
+                    expand = true,
+                    align_h = "fill",
+                    texture_name = make_color_texture(png_color),
+                },
                 gui.Button {
                     label = ServerS(player, "Update"),
                     -- no on_event needed
