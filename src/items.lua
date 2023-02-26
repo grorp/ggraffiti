@@ -1,8 +1,8 @@
 local shared = ...
 
 local S = minetest.get_translator("ggraffiti")
--- use server-side translation in formspecs to allow their layout to respond to
--- the length of the translated strings
+-- In formspecs, I use server-side translations so that the layout of the
+-- formspecs can adapt to the length of the translated strings.
 local function ServerS(player, string, ...)
     local lang_code = minetest.get_player_information(player:get_player_name()).lang_code
     return minetest.get_translated_string(lang_code, S(string, ...))
@@ -220,7 +220,7 @@ rgb_spray_can_change_color_gui = flow.make_gui(function(player, ctx)
                 label = ServerS(player, "Save"),
                 expand = true,
                 on_event = function(player, ctx)
-                    -- We have to do this again here as this callback isn't
+                    -- We have to do this again here because this callback isn't
                     -- always called after the others.
                     ctx.form.field_r = adjust_field_value(ctx.form.field_r)
                     ctx.form.field_g = adjust_field_value(ctx.form.field_g)
