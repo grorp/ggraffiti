@@ -92,27 +92,25 @@ local gui = flow.widgets
 local rgb_spray_can_gui
 local rgb_spray_can_change_color_gui
 
-local function make_color_gui_element(color)
-    local color_png = minetest.encode_png(1, 1, { color }, 9)
-    color_png = minetest.encode_base64(color_png)
-    return gui.Image {
-        w = 0.8,
-        h = 0.8,
-        align_h = "fill",
-        texture_name = "[png:" .. color_png,
-    }
+local function make_color_texture(color)
+    local png = minetest.encode_png(1, 1, { color }, 9)
+    return "[png:" .. minetest.encode_base64(png)
 end
 
 rgb_spray_can_gui = flow.make_gui(function(player, ctx)
     return gui.VBox {
-        min_w = 8,
+        min_w = 20,
         padding = 0.4,
         spacing = 0.4,
         gui.label { label = S("RGB Graffiti Spray Can") },
         gui.Label { label = S("Color") },
         gui.HBox {
             spacing = 0.4,
-            make_color_gui_element(ctx.color),
+            gui.Image {
+                w = 0.8,
+                h = 0.8,
+                texture_name = make_color_texture(ctx.color),
+            },
             gui.Label {
                 label = S("R: @1, G: @2, B: @3", ctx.color.r, ctx.color.g, ctx.color.b),
                 expand = true,
@@ -130,47 +128,54 @@ rgb_spray_can_gui = flow.make_gui(function(player, ctx)
     }
 end)
 
-local players_to_update = {}
-local players_to_save = {}
+local function adjust_field_value(val)
+    local int = math.floor(tonumber(val) or 0)
+    local clamped = math.min(math.max(int, 0), 255)
+    return tostring(clamped)
+end
 
 rgb_spray_can_change_color_gui = flow.make_gui(function(player, ctx)
     local png_color = {
-        r = ctx.form.r_field and tonumber(ctx.form.r_field) or ctx.color.r,
-        g = ctx.form.g_field and tonumber(ctx.form.g_field) or ctx.color.g,
-        b = ctx.form.b_field and tonumber(ctx.form.b_field) or ctx.color.b,
+        r = ctx.form.field_r and tonumber(ctx.form.field_r) or ctx.color.r,
+        g = ctx.form.field_g and tonumber(ctx.form.field_g) or ctx.color.g,
+        b = ctx.form.field_b and tonumber(ctx.form.field_b) or ctx.color.b,
     }
 
     return gui.VBox {
+        min_w = 20,
         padding = 0.4,
         spacing = 0.4,
         gui.Label { label = S("Change color") },
         gui.HBox {
             spacing = 0.4,
             gui.Field {
-                name = "r_field",
+                name = "field_r",
                 label = minetest.colorize("#f00", S("R (Red)")),
                 default = tostring(ctx.color.r),
                 expand = true,
                 on_event = function(player, ctx)
-                    players_to_update[player:get_player_name()] = true
+                    ctx.form.field_r = adjust_field_value(ctx.form.field_r)
+                    return true
                 end,
             },
             gui.Field {
-                name = "g_field",
+                name = "field_g",
                 label = minetest.colorize("#0f0", S("G (Green)")),
                 default = tostring(ctx.color.g),
                 expand = true,
                 on_event = function(player, ctx)
-                    players_to_update[player:get_player_name()] = true
+                    ctx.form.field_g = adjust_field_value(ctx.form.field_g)
+                    return true
                 end,
             },
             gui.Field {
-                name = "b_field",
+                name = "field_b",
                 label = minetest.colorize("#00f", S("B (Blue)")),
                 default = tostring(ctx.color.b),
                 expand = true,
                 on_event = function(player, ctx)
-                    players_to_update[player:get_player_name()] = true
+                    ctx.form.field_b = adjust_field_value(ctx.form.field_b)
+                    return true
                 end,
             },
         },
@@ -178,7 +183,20 @@ rgb_spray_can_change_color_gui = flow.make_gui(function(player, ctx)
         gui.VBox {
             spacing = 0,
             gui.Label { label = S("Preview") },
-            make_color_gui_element(png_color),
+            gui.HBox {
+                spacing = 0.4,
+                gui.Image {
+                    w = 0.8,
+                    h = 0.8,
+                    expand = true,
+                    align_h = "fill",
+                    texture_name = make_color_texture(png_color),
+                },
+                gui.Button {
+                    label = S("Update"),
+                    -- no on_event needed
+                },
+            },
         },
         gui.HBox {
             spacing = 0.4,
@@ -192,73 +210,39 @@ rgb_spray_can_change_color_gui = flow.make_gui(function(player, ctx)
                 end,
             },
             gui.Button {
-                label = S("Update preview / Save"),
+                label = S("Save"),
                 expand = true,
                 on_event = function(player, ctx)
-                    players_to_update[player:get_player_name()] = true
-                    players_to_save[player:get_player_name()] = true
+                    -- We have to do this again here as this callback isn't
+                    -- always called after the others.
+                    ctx.form.field_r = adjust_field_value(ctx.form.field_r)
+                    ctx.form.field_g = adjust_field_value(ctx.form.field_g)
+                    ctx.form.field_b = adjust_field_value(ctx.form.field_b)
+
+                    local item = player:get_wielded_item()
+                    -- verify that we're replacing the correct item
+                    if item:get_name() == "ggraffiti:spray_can_rgb" then
+                        local meta = item:get_meta()
+                        local color = meta_get_color(meta)
+                        -- verify that we're *really* replacing the correct item
+                        if (ctx.color == nil and color == nil) or
+                                (ctx.color.r == color.r and ctx.color.g == color.g and ctx.color.b == color.b) then
+                            color = {
+                                r = tonumber(ctx.form.field_r),
+                                g = tonumber(ctx.form.field_g),
+                                b = tonumber(ctx.form.field_b),
+                            }
+                            meta_set_color(meta, color)
+                            player:set_wielded_item(item)
+                            rgb_spray_can_gui:show(player, {
+                                color = color,
+                            })
+                        end
+                    end
                 end,
             },
         },
     }
-end)
-
-local function adjust_field_value(val)
-    local int = math.floor(tonumber(val) or 0)
-    local clamped = math.min(math.max(int, 0), 255)
-    return tostring(clamped)
-end
-
-local function global_update_form(player, ctx)
-    ctx.prev_r_field = ctx.prev_r_field or tostring(ctx.color.r)
-    ctx.prev_g_field = ctx.prev_g_field or tostring(ctx.color.g)
-    ctx.prev_b_field = ctx.prev_b_field or tostring(ctx.color.b)
-    local fields_have_changed =
-        ctx.form.r_field ~= ctx.prev_r_field or
-        ctx.form.g_field ~= ctx.prev_g_field or
-        ctx.form.b_field ~= ctx.prev_b_field
-
-    ctx.form.r_field = adjust_field_value(ctx.form.r_field)
-    ctx.form.g_field = adjust_field_value(ctx.form.g_field)
-    ctx.form.b_field = adjust_field_value(ctx.form.b_field)
-    ctx.prev_r_field = ctx.form.r_field
-    ctx.prev_g_field = ctx.form.g_field
-    ctx.prev_b_field = ctx.form.b_field
-
-    if players_to_save[player:get_player_name()] and not fields_have_changed then
-        local item = player:get_wielded_item()
-        -- verify that we're replacing the correct item
-        if item:get_name() == "ggraffiti:spray_can_rgb" then
-            local meta = item:get_meta()
-            local color = meta_get_color(meta)
-            -- verify that we're *really* replacing the correct item
-            if color.r == ctx.color.r and color.g == ctx.color.g and
-                    color.b == ctx.color.b then
-                color.r = tonumber(ctx.form.r_field)
-                color.g = tonumber(ctx.form.g_field)
-                color.b = tonumber(ctx.form.b_field)
-                meta_set_color(meta, color)
-                player:set_wielded_item(item)
-                rgb_spray_can_gui:show(player, {
-                    color = color,
-                })
-            end
-        end
-        return false
-    else
-        return true -- update the form
-    end
-end
-
-minetest.register_globalstep(function()
-    rgb_spray_can_change_color_gui:update_where(function(player, ctx)
-        if players_to_update[player:get_player_name()] then
-            return global_update_form(player, ctx)
-        end
-        return false
-    end)
-    players_to_update = {}
-    players_to_save = {}
 end)
 
 local function rgb_spray_can_on_place(item, player, pointed_thing)
