@@ -102,7 +102,6 @@ end
 
 rgb_spray_can_gui = flow.make_gui(function(player, ctx)
     return gui.VBox {
-        min_w = 20,
         padding = 0.4,
         spacing = 0.4,
         gui.label { label = ServerS(player, "RGB Graffiti Spray Can") },
@@ -137,6 +136,46 @@ local function adjust_field_value(val)
     return tostring(clamped)
 end
 
+local function cancel_button_on_event(player, ctx)
+    if ctx.initial_setup then
+        -- This button is invisible, how dare you click it?
+        return
+    end
+    rgb_spray_can_gui:show(player, {
+        color = ctx.color,
+    })
+end
+
+local function save_button_on_event(player, ctx)
+    -- We have to do this again here because this callback isn't
+    -- always called after the others.
+    ctx.form.field_r = adjust_field_value(ctx.form.field_r)
+    ctx.form.field_g = adjust_field_value(ctx.form.field_g)
+    ctx.form.field_b = adjust_field_value(ctx.form.field_b)
+
+    local item = player:get_wielded_item()
+    -- verify that we're replacing the correct item
+    if item:get_name() == "ggraffiti:spray_can_rgb" then
+        local meta = item:get_meta()
+        local color = meta_get_color(meta)
+        -- verify that we're *really* replacing the correct item
+        if (ctx.color == nil and color == nil) or
+                (ctx.color ~= nil and color ~= nil and
+                ctx.color.r == color.r and ctx.color.g == color.g and ctx.color.b == color.b) then
+            color = {
+                r = tonumber(ctx.form.field_r),
+                g = tonumber(ctx.form.field_g),
+                b = tonumber(ctx.form.field_b),
+            }
+            meta_set_color(meta, color)
+            player:set_wielded_item(item)
+            rgb_spray_can_gui:show(player, {
+                color = color,
+            })
+        end
+    end
+end
+
 rgb_spray_can_change_color_gui = flow.make_gui(function(player, ctx)
     local has_input_color = not not (ctx.form.field_r and ctx.form.field_g and ctx.form.field_b)
     local has_default_color = not ctx.initial_setup
@@ -150,13 +189,12 @@ rgb_spray_can_change_color_gui = flow.make_gui(function(player, ctx)
     end
 
     return gui.VBox {
-        min_w = 20,
         padding = 0.4,
         spacing = 0.4,
         gui.Label {
             label = ctx.initial_setup and
-                    ServerS(player, "Set color") or
-                    ServerS(player, "Change color"),
+                ServerS(player, "Set color") or
+                ServerS(player, "Change color"),
         },
         gui.HBox {
             spacing = 0.4,
@@ -197,12 +235,13 @@ rgb_spray_can_change_color_gui = flow.make_gui(function(player, ctx)
             gui.Label { label = ServerS(player, "Preview") },
             gui.HBox {
                 spacing = 0.4,
-                not png_color and gui.Spacer {} or gui.Image {
+                gui.Image {
                     w = 0.8,
                     h = 0.8,
                     expand = true,
                     align_h = "fill",
-                    texture_name = make_color_texture(png_color),
+                    texture_name = png_color and make_color_texture(png_color),
+                    visible = not not png_color,
                 },
                 gui.Button {
                     label = ServerS(player, "Update"),
@@ -212,47 +251,16 @@ rgb_spray_can_change_color_gui = flow.make_gui(function(player, ctx)
         },
         gui.HBox {
             spacing = 0.4,
-            ctx.initial_setup and gui.Spacer {} or gui.Button {
+            gui.Button {
                 label = ServerS(player, "Cancel"),
                 expand = true,
-                on_event = function(player, ctx)
-                    rgb_spray_can_gui:show(player, {
-                        color = ctx.color,
-                    })
-                end,
+                visible = not ctx.initial_setup,
+                on_event = cancel_button_on_event,
             },
             gui.Button {
                 label = ServerS(player, "Save"),
                 expand = true,
-                on_event = function(player, ctx)
-                    -- We have to do this again here because this callback isn't
-                    -- always called after the others.
-                    ctx.form.field_r = adjust_field_value(ctx.form.field_r)
-                    ctx.form.field_g = adjust_field_value(ctx.form.field_g)
-                    ctx.form.field_b = adjust_field_value(ctx.form.field_b)
-
-                    local item = player:get_wielded_item()
-                    -- verify that we're replacing the correct item
-                    if item:get_name() == "ggraffiti:spray_can_rgb" then
-                        local meta = item:get_meta()
-                        local color = meta_get_color(meta)
-                        -- verify that we're *really* replacing the correct item
-                        if (ctx.color == nil and color == nil) or
-                                (ctx.color ~= nil and color ~= nil and
-                                ctx.color.r == color.r and ctx.color.g == color.g and ctx.color.b == color.b) then
-                            color = {
-                                r = tonumber(ctx.form.field_r),
-                                g = tonumber(ctx.form.field_g),
-                                b = tonumber(ctx.form.field_b),
-                            }
-                            meta_set_color(meta, color)
-                            player:set_wielded_item(item)
-                            rgb_spray_can_gui:show(player, {
-                                color = color,
-                            })
-                        end
-                    end
-                end,
+                on_event = save_button_on_event,
             },
         },
     }
