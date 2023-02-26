@@ -1,6 +1,13 @@
 local shared = ...
 
 local S = minetest.get_translator("ggraffiti")
+-- use server-side translation in formspecs to allow their layout to respond to
+-- the length of the translated strings
+local function ServerS(player, string, ...)
+    local lang_code = minetest.get_player_information(player:get_player_name()).lang_code
+    return minetest.get_translated_string(lang_code, S(string, ...))
+end
+
 local player_lasts = {}
 
 local function get_eye_pos(player)
@@ -102,8 +109,8 @@ rgb_spray_can_gui = flow.make_gui(function(player, ctx)
         min_w = 20,
         padding = 0.4,
         spacing = 0.4,
-        gui.label { label = S("RGB Graffiti Spray Can") },
-        gui.Label { label = S("Color") },
+        gui.label { label = ServerS(player, "RGB Graffiti Spray Can") },
+        gui.Label { label = ServerS(player, "Color") },
         gui.HBox {
             spacing = 0.4,
             gui.Image {
@@ -112,12 +119,12 @@ rgb_spray_can_gui = flow.make_gui(function(player, ctx)
                 texture_name = make_color_texture(ctx.color),
             },
             gui.Label {
-                label = S("R: @1, G: @2, B: @3", ctx.color.r, ctx.color.g, ctx.color.b),
+                label = ServerS(player, "R: @1, G: @2, B: @3", ctx.color.r, ctx.color.g, ctx.color.b),
                 expand = true,
                 align_h = "left",
             },
             gui.Button {
-                label = S("Change"),
+                label = ServerS(player, "Change"),
                 on_event = function(player, ctx)
                     rgb_spray_can_change_color_gui:show(player, {
                         color = ctx.color,
@@ -145,12 +152,12 @@ rgb_spray_can_change_color_gui = flow.make_gui(function(player, ctx)
         min_w = 20,
         padding = 0.4,
         spacing = 0.4,
-        gui.Label { label = S("Change color") },
+        gui.Label { label = ServerS(player, "Change color") },
         gui.HBox {
             spacing = 0.4,
             gui.Field {
                 name = "field_r",
-                label = minetest.colorize("#f00", S("R (Red)")),
+                label = minetest.colorize("#f00", ServerS(player, "R (Red)")),
                 default = tostring(ctx.color.r),
                 expand = true,
                 on_event = function(player, ctx)
@@ -160,7 +167,7 @@ rgb_spray_can_change_color_gui = flow.make_gui(function(player, ctx)
             },
             gui.Field {
                 name = "field_g",
-                label = minetest.colorize("#0f0", S("G (Green)")),
+                label = minetest.colorize("#0f0", ServerS(player, "G (Green)")),
                 default = tostring(ctx.color.g),
                 expand = true,
                 on_event = function(player, ctx)
@@ -170,7 +177,7 @@ rgb_spray_can_change_color_gui = flow.make_gui(function(player, ctx)
             },
             gui.Field {
                 name = "field_b",
-                label = minetest.colorize("#00f", S("B (Blue)")),
+                label = minetest.colorize("#00f", ServerS(player, "B (Blue)")),
                 default = tostring(ctx.color.b),
                 expand = true,
                 on_event = function(player, ctx)
@@ -179,10 +186,10 @@ rgb_spray_can_change_color_gui = flow.make_gui(function(player, ctx)
                 end,
             },
         },
-        gui.Label { label = S("Values must be integers in the range [0..255].") },
+        gui.Label { label = ServerS(player, "Values must be integers in the range [0..255].") },
         gui.VBox {
             spacing = 0,
-            gui.Label { label = S("Preview") },
+            gui.Label { label = ServerS(player, "Preview") },
             gui.HBox {
                 spacing = 0.4,
                 gui.Image {
@@ -193,7 +200,7 @@ rgb_spray_can_change_color_gui = flow.make_gui(function(player, ctx)
                     texture_name = make_color_texture(png_color),
                 },
                 gui.Button {
-                    label = S("Update"),
+                    label = ServerS(player, "Update"),
                     -- no on_event needed
                 },
             },
@@ -201,7 +208,7 @@ rgb_spray_can_change_color_gui = flow.make_gui(function(player, ctx)
         gui.HBox {
             spacing = 0.4,
             gui.Button {
-                label = S("Cancel"),
+                label = ServerS(player, "Cancel"),
                 expand = true,
                 on_event = function(player, ctx)
                     rgb_spray_can_gui:show(player, {
@@ -210,7 +217,7 @@ rgb_spray_can_change_color_gui = flow.make_gui(function(player, ctx)
                 end,
             },
             gui.Button {
-                label = S("Save"),
+                label = ServerS(player, "Save"),
                 expand = true,
                 on_event = function(player, ctx)
                     -- We have to do this again here as this callback isn't
