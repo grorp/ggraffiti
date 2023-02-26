@@ -233,7 +233,8 @@ rgb_spray_can_change_color_gui = flow.make_gui(function(player, ctx)
                         local color = meta_get_color(meta)
                         -- verify that we're *really* replacing the correct item
                         if (ctx.color == nil and color == nil) or
-                                (ctx.color.r == color.r and ctx.color.g == color.g and ctx.color.b == color.b) then
+                                (ctx.color ~= nil and color ~= nil and
+                                ctx.color.r == color.r and ctx.color.g == color.g and ctx.color.b == color.b) then
                             color = {
                                 r = tonumber(ctx.form.field_r),
                                 g = tonumber(ctx.form.field_g),
