@@ -137,10 +137,6 @@ local function adjust_field_value(val)
 end
 
 local function cancel_button_on_event(player, ctx)
-    if ctx.initial_setup then
-        -- This button is invisible, how dare you click it?
-        return
-    end
     rgb_spray_can_gui:show(player, {
         color = ctx.color,
     })
@@ -183,10 +179,48 @@ rgb_spray_can_change_color_gui = flow.make_gui(function(player, ctx)
     if has_input_color or has_default_color then
         png_color = {
             r = has_input_color and tonumber(ctx.form.field_r) or ctx.color.r,
-            g = has_input_color and tonumber(ctx.form.field_g) or ctx.color.r,
-            b = has_input_color and tonumber(ctx.form.field_b) or ctx.color.r,
+            g = has_input_color and tonumber(ctx.form.field_g) or ctx.color.g,
+            b = has_input_color and tonumber(ctx.form.field_b) or ctx.color.b,
         }
     end
+
+    local preview_h_box = gui.HBox {
+        spacing = 0.4,
+    }
+    if png_color then
+        table.insert(preview_h_box, gui.Image {
+            w = 0.8,
+            h = 0.8,
+            expand = true,
+            align_h = "fill",
+            texture_name = make_color_texture(png_color),
+        })
+    end
+    local preview_update_button = gui.Button {
+        label = ServerS(player, "Update"),
+        -- no on_event needed
+    }
+    if not png_color then
+        preview_update_button.expand = true
+        preview_update_button.align_h = "right"
+    end
+    table.insert(preview_h_box, preview_update_button)
+
+    local buttons_h_box = gui.HBox {
+        spacing = 0.4,
+    }
+    if not ctx.initial_setup then
+        table.insert(buttons_h_box, gui.Button {
+            label = ServerS(player, "Cancel"),
+            expand = true,
+            on_event = cancel_button_on_event,
+        })
+    end
+    table.insert(buttons_h_box, gui.Button {
+        label = ServerS(player, "Save"),
+        expand = true,
+        on_event = save_button_on_event,
+    })
 
     return gui.VBox {
         padding = 0.4,
@@ -233,36 +267,9 @@ rgb_spray_can_change_color_gui = flow.make_gui(function(player, ctx)
         gui.VBox {
             spacing = 0,
             gui.Label { label = ServerS(player, "Preview") },
-            gui.HBox {
-                spacing = 0.4,
-                gui.Image {
-                    w = 0.8,
-                    h = 0.8,
-                    expand = true,
-                    align_h = "fill",
-                    texture_name = png_color and make_color_texture(png_color),
-                    visible = not not png_color,
-                },
-                gui.Button {
-                    label = ServerS(player, "Update"),
-                    -- no on_event needed
-                },
-            },
+            preview_h_box,
         },
-        gui.HBox {
-            spacing = 0.4,
-            gui.Button {
-                label = ServerS(player, "Cancel"),
-                expand = true,
-                visible = not ctx.initial_setup,
-                on_event = cancel_button_on_event,
-            },
-            gui.Button {
-                label = ServerS(player, "Save"),
-                expand = true,
-                on_event = save_button_on_event,
-            },
-        },
+        buttons_h_box,
     }
 end)
 
