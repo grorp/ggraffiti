@@ -1,10 +1,13 @@
 local shared = ...
 
 function shared.spraycast(player, pos, dir, def)
+    print("[shared.spraycast]")
+    print("def.color before: " .. dump(def.color))
     def = {
         -- Somehow it doesn't work (= crashes) with tables.
-        color = minetest.colorspec_to_colorstring(def),
+        color = minetest.colorspec_to_colorstring(def.color),
     }
+    print("def.color after: " .. dump(def.color))
 
     local ray = minetest.raycast(pos, pos + dir * shared.MAX_SPRAY_DISTANCE, true, false)
     local pthing
