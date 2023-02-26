@@ -206,14 +206,14 @@ local function spray_step(player)
 
         if now_pos:equals(last.pos) and now_dir:equals(last.dir) then
             -- The player hasn't moved, but the world may have changed.
-            shared.spraycast(player, now_pos, now_dir, def._ggraffiti_spray_can)
+            shared.spraycast(player, now_pos, now_dir, spray_def)
         else
             for step_n = 1, n_steps do
                 local lerp = lerp_factory(step_n / n_steps)
                 local pos = vector.combine(last.pos, now_pos, lerp)
                 local dir = vector.combine(last.dir, now_dir, lerp):normalize() -- "nlerp"
 
-                shared.spraycast(player, pos, dir, def._ggraffiti_spray_can)
+                shared.spraycast(player, pos, dir, spray_def)
             end
         end
     end
