@@ -46,4 +46,5 @@ local basepath = minetest.get_modpath("ggraffiti") .. "/src"
 assert(loadfile(basepath .. "/aabb.lua"))(shared)
 assert(loadfile(basepath .. "/canvas.lua"))(shared)
 assert(loadfile(basepath .. "/spraycast.lua"))(shared)
+assert(loadfile(basepath .. "/gui.lua"))(shared)
 assert(loadfile(basepath .. "/items.lua"))(shared)

@@ -1,12 +1,5 @@
 local shared = ...
-
 local S = minetest.get_translator("ggraffiti")
--- In formspecs, I use server-side translations so that the layout of the
--- formspecs can adapt to the length of the translated strings.
-local function ServerS(player, string, ...)
-    local lang_code = minetest.get_player_information(player:get_player_name()).lang_code
-    return minetest.get_translated_string(lang_code, S(string, ...))
-end
 
 local player_lasts = {}
 
@@ -57,7 +50,7 @@ end
 local function spray_can_rgb_on_place(item, player)
     local spray_def = item:get_definition()._ggraffiti_spray_can
     if spray_def.rgb then
-        shared.rgb_show_gui(player)
+        shared.rgb_show_gui(player, item)
     end
 end
 
@@ -170,53 +163,62 @@ local function lerp_factory(t)
     end
 end
 
-local function spray_step()
-    for _, player in ipairs(minetest.get_connected_players()) do
-        local player_name = player:get_player_name()
-        local item = player:get_wielded_item()
-        local def = item:get_definition()
+local function spray_step(player)
+    print("[spray_step] " .. player:get_player_name())
+    local player_name = player:get_player_name()
 
-        if def then
-            local spray_def = def._ggraffiti_spray_can
-            if spray_def then
-                if spray_def.rgb then
-                    spray_def = {
-                        color = shared.rgb_get_color(item),
-                    }
-                    if not spray_def.color then
-                        return
-                    end
+    if not player:get_player_control().dig then
+        print("not digging, returning")
+        player_lasts[player_name] = nil
+        return
+    end
 
-        if def._ggraffiti_spray_can and player:get_player_control().dig then
-            local last = player_lasts[player_name]
+    local item = player:get_wielded_item()
+    local def = item:get_definition()
+    local spray_def = def and def._ggraffiti_spray_can
+    if not spray_def then
+        print("no spray def, returning")
+        player_lasts[player_name] = nil
+        return
+    end
 
-            local now_pos = get_eye_pos(player)
-            local now_dir = player:get_look_dir()
-
-            if last then
-                local n_steps = shared.NUM_SPRAY_STEPS
-                item, n_steps = wear_out(player_name, item, n_steps)
-                player:set_wielded_item(item)
-
-                if now_pos:equals(last.pos) and now_dir:equals(last.dir) then
-                    -- The player hasn't moved, but the world may have changed.
-                    shared.spraycast(player, now_pos, now_dir, def._ggraffiti_spray_can)
-                else
-                    for step_n = 1, n_steps do
-                        local lerp = lerp_factory(step_n / n_steps)
-                        local pos = vector.combine(last.pos, now_pos, lerp)
-                        local dir = vector.combine(last.dir, now_dir, lerp):normalize() -- "nlerp"
-
-                        shared.spraycast(player, pos, dir, def._ggraffiti_spray_can)
-                    end
-                end
-            end
-
-            player_lasts[player_name] = {pos = now_pos, dir = now_dir}
-        else
+    if spray_def.rgb then
+        spray_def = {
+            color = shared.rgb_get_color(item),
+        }
+        if not spray_def.color then
+            print("no color in rgb spray can meta, returning")
             player_lasts[player_name] = nil
+            return
         end
     end
+
+    print("chosen spray def: " .. dump(spray_def))
+
+    local last = player_lasts[player_name]
+    local now_pos = get_eye_pos(player)
+    local now_dir = player:get_look_dir()
+
+    if last then
+        local n_steps = shared.NUM_SPRAY_STEPS
+        item, n_steps = wear_out(player_name, item, n_steps)
+        player:set_wielded_item(item)
+
+        if now_pos:equals(last.pos) and now_dir:equals(last.dir) then
+            -- The player hasn't moved, but the world may have changed.
+            shared.spraycast(player, now_pos, now_dir, def._ggraffiti_spray_can)
+        else
+            for step_n = 1, n_steps do
+                local lerp = lerp_factory(step_n / n_steps)
+                local pos = vector.combine(last.pos, now_pos, lerp)
+                local dir = vector.combine(last.dir, now_dir, lerp):normalize() -- "nlerp"
+
+                shared.spraycast(player, pos, dir, def._ggraffiti_spray_can)
+            end
+        end
+    end
+
+    player_lasts[player_name] = {pos = now_pos, dir = now_dir}
 end
 
 local dtime_accu = 0
@@ -225,7 +227,9 @@ minetest.register_globalstep(function(dtime)
     dtime_accu = dtime_accu + dtime
     if dtime_accu >= shared.SPRAY_STEP_INTERVAL then
         dtime_accu = dtime_accu % shared.SPRAY_STEP_INTERVAL
-        spray_step()
+        for _, player in ipairs(minetest.get_connected_players()) do
+            spray_step(player)
+        end
         shared.update_canvases()
     end
 end)

@@ -1,5 +1,13 @@
 local shared = ...
 local gui = flow.widgets
+local S = minetest.get_translator("ggraffiti")
+
+-- In formspecs, I use server-side translations so that the layout of the
+-- formspecs can adapt to the length of the translated strings.
+local function ServerS(player, string, ...)
+    local lang_code = minetest.get_player_information(player:get_player_name()).lang_code
+    return minetest.get_translated_string(lang_code, S(string, ...))
+end
 
 function shared.rgb_get_color(item)
     local meta = item:get_meta()
