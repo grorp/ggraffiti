@@ -1,14 +1,6 @@
 local shared = ...
 
 function shared.spraycast(player, pos, dir, def)
-    print("[shared.spraycast]")
-    print("def.color before: " .. dump(def.color))
-    def = {
-        -- Somehow it doesn't work (= crashes) with tables.
-        color = minetest.colorspec_to_colorstring(def.color),
-    }
-    print("def.color after: " .. dump(def.color))
-
     local ray = minetest.raycast(pos, pos + dir * shared.MAX_SPRAY_DISTANCE, true, false)
     local pthing
     for i_pthing in ray do
@@ -87,8 +79,9 @@ function shared.spraycast(player, pos, dir, def)
             end
         end
     else
-        if canvas.bitmap[index] ~= def.color then
-            canvas.bitmap[index] = def.color
+        local color = minetest.colorspec_to_colorstring(def.color)
+        if canvas.bitmap[index] ~= color then
+            canvas.bitmap[index] = color
             canvas:update_later()
         end
     end
