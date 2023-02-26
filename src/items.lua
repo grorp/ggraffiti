@@ -48,10 +48,7 @@ local function spray_can_on_use(item, player)
 end
 
 local function spray_can_rgb_on_place(item, player)
-    local spray_def = item:get_definition()._ggraffiti_spray_can
-    if spray_def.rgb then
-        shared.rgb_show_gui(player, item)
-    end
+    shared.rgb_show_gui(player, item)
 end
 
 minetest.register_craftitem("ggraffiti:spray_can_empty", { -- stackable
