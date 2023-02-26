@@ -24,6 +24,7 @@ R: @1, G: @2, B: @3=R: @1, G: @2, B: @3
 Color=Farbe
 Change=Ändern
 
+Set color=Farbe festlegen
 Change color=Farbe ändern
 R (Red)=R (Rot)
 G (Green)=G (Grün)

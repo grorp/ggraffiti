@@ -83,11 +83,7 @@ for _, dye in ipairs(dye.dyes) do
 end
 
 local function meta_get_color(meta)
-    local color = minetest.deserialize(meta:get_string("ggraffiti_color"))
-    if not color then
-        color = { r = 0, g = 0, b = 0 }
-    end
-    return color
+    return minetest.deserialize(meta:get_string("ggraffiti_color"))
 end
 
 local function meta_set_color(meta, color)
@@ -142,23 +138,21 @@ local function adjust_field_value(val)
 end
 
 rgb_spray_can_change_color_gui = flow.make_gui(function(player, ctx)
-    local png_color = {
-        r = ctx.form.field_r and tonumber(ctx.form.field_r) or ctx.color.r,
-        g = ctx.form.field_g and tonumber(ctx.form.field_g) or ctx.color.g,
-        b = ctx.form.field_b and tonumber(ctx.form.field_b) or ctx.color.b,
-    }
-
     return gui.VBox {
         min_w = 20,
         padding = 0.4,
         spacing = 0.4,
-        gui.Label { label = ServerS(player, "Change color") },
+        gui.Label {
+            label = ctx.initial_setup and
+                    ServerS(player, "Set color") or
+                    ServerS(player, "Change color"),
+        },
         gui.HBox {
             spacing = 0.4,
             gui.Field {
                 name = "field_r",
                 label = minetest.colorize("#f00", ServerS(player, "R (Red)")),
-                default = tostring(ctx.color.r),
+                default = ctx.initial_setup and "" or tostring(ctx.color.r),
                 expand = true,
                 on_event = function(player, ctx)
                     ctx.form.field_r = adjust_field_value(ctx.form.field_r)
@@ -168,7 +162,7 @@ rgb_spray_can_change_color_gui = flow.make_gui(function(player, ctx)
             gui.Field {
                 name = "field_g",
                 label = minetest.colorize("#0f0", ServerS(player, "G (Green)")),
-                default = tostring(ctx.color.g),
+                default = ctx.initial_setup and "" or tostring(ctx.color.g),
                 expand = true,
                 on_event = function(player, ctx)
                     ctx.form.field_g = adjust_field_value(ctx.form.field_g)
@@ -178,7 +172,7 @@ rgb_spray_can_change_color_gui = flow.make_gui(function(player, ctx)
             gui.Field {
                 name = "field_b",
                 label = minetest.colorize("#00f", ServerS(player, "B (Blue)")),
-                default = tostring(ctx.color.b),
+                default = ctx.initial_setup and "" or tostring(ctx.color.b),
                 expand = true,
                 on_event = function(player, ctx)
                     ctx.form.field_b = adjust_field_value(ctx.form.field_b)
@@ -192,13 +186,6 @@ rgb_spray_can_change_color_gui = flow.make_gui(function(player, ctx)
             gui.Label { label = ServerS(player, "Preview") },
             gui.HBox {
                 spacing = 0.4,
-                gui.Image {
-                    w = 0.8,
-                    h = 0.8,
-                    expand = true,
-                    align_h = "fill",
-                    texture_name = make_color_texture(png_color),
-                },
                 gui.Button {
                     label = ServerS(player, "Update"),
                     -- no on_event needed
@@ -207,7 +194,7 @@ rgb_spray_can_change_color_gui = flow.make_gui(function(player, ctx)
         },
         gui.HBox {
             spacing = 0.4,
-            gui.Button {
+            ctx.initial_setup and gui.Spacer {} or gui.Button {
                 label = ServerS(player, "Cancel"),
                 expand = true,
                 on_event = function(player, ctx)
@@ -256,9 +243,15 @@ end)
 local function rgb_spray_can_on_place(item, player, pointed_thing)
     local meta = item:get_meta()
     local color = meta_get_color(meta)
-    rgb_spray_can_gui:show(player, {
-        color = color,
-    })
+    if not color then
+        rgb_spray_can_change_color_gui:show(player, {
+            initial_setup = true,
+        })
+    else
+        rgb_spray_can_gui:show(player, {
+            color = color,
+        })
+    end
 end
 
 minetest.register_tool("ggraffiti:spray_can_rgb", {
