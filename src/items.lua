@@ -164,11 +164,9 @@ local function lerp_factory(t)
 end
 
 local function spray_step(player)
-    print("[spray_step] " .. player:get_player_name())
     local player_name = player:get_player_name()
 
     if not player:get_player_control().dig then
-        print("not digging, returning")
         player_lasts[player_name] = nil
         return
     end
@@ -177,7 +175,6 @@ local function spray_step(player)
     local def = item:get_definition()
     local spray_def = def and def._ggraffiti_spray_can
     if not spray_def then
-        print("no spray def, returning")
         player_lasts[player_name] = nil
         return
     end
@@ -187,13 +184,10 @@ local function spray_step(player)
             color = shared.rgb_get_color(item),
         }
         if not spray_def.color then
-            print("no color in rgb spray can meta, returning")
             player_lasts[player_name] = nil
             return
         end
     end
-
-    print("chosen spray def: " .. dump(spray_def))
 
     local last = player_lasts[player_name]
     local now_pos = get_eye_pos(player)
