@@ -165,9 +165,13 @@ local function save_button_on_event(player, ctx)
             }
             meta_set_color(meta, color)
             player:set_wielded_item(item)
-            rgb_spray_can_gui:show(player, {
-                color = color,
-            })
+            if ctx.initial_setup then
+                rgb_spray_can_change_color_gui:close(player)
+            else
+                rgb_spray_can_gui:show(player, {
+                    color = color,
+                })
+            end
         end
     end
 end
