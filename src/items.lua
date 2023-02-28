@@ -33,7 +33,7 @@ local function spray_can_on_use(item, player)
             color = shared.rgb_get_color(item),
         }
         if not spray_def.color then
-            shared.rgb_show_gui_no_color(player)
+            shared.rgb_show_gui_initial_setup(player)
             return
         end
     end

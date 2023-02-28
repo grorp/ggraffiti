@@ -206,7 +206,7 @@ rgb_change_color_gui = flow.make_gui(function(player, ctx)
     }
 end)
 
-function shared.rgb_show_gui_no_color(player)
+function shared.rgb_show_gui_initial_setup(player)
     rgb_change_color_gui:show(player, {
         initial_setup = true,
     })
@@ -215,7 +215,7 @@ end
 function shared.rgb_show_gui(player, item)
     local color = shared.rgb_get_color(item)
     if not color then
-        shared.rgb_show_gui_no_color(player)
+        shared.rgb_show_gui_initial_setup(player)
     else
         rgb_gui:show(player, {
             color = color,
