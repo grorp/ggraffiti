@@ -9,6 +9,11 @@ local function ServerS(player, string, ...)
     return minetest.get_translated_string(lang_code, S(string, ...))
 end
 
+function shared.get_raw_spray_def(item)
+    local def = item:get_definition()
+    return def and def._ggraffiti_spray_can
+end
+
 function shared.rgb_get_color(item)
     local meta = item:get_meta()
     return minetest.deserialize(meta:get_string("ggraffiti_color"))
@@ -77,9 +82,9 @@ local function save_button_on_event(player, ctx)
     ctx.form.field_b = adjust_field_value(ctx.form.field_b)
 
     local item = player:get_wielded_item()
-    local def = item:get_definition()
+    local spray_def = shared.get_raw_spray_def(item)
     -- verify that we're replacing the correct item
-    if def and def._ggraffiti_spray_can.rgb then
+    if spray_def and spray_def.rgb then
         local color = shared.rgb_get_color(item)
         -- verify that we're *really* replacing the correct item
         if (ctx.color == nil and color == nil) or
@@ -127,15 +132,12 @@ rgb_change_color_gui = flow.make_gui(function(player, ctx)
             texture_name = make_color_texture(png_color),
         })
     end
-    local preview_update_button = gui.Button {
+    table.insert(preview_h_box, gui.Button {
         label = ServerS(player, "Update"),
+        expand = not png_color or nil,
+        align_h = not png_color and "right" or nil,
         -- no on_event needed
-    }
-    if not png_color then
-        preview_update_button.expand = true
-        preview_update_button.align_h = "right"
-    end
-    table.insert(preview_h_box, preview_update_button)
+    })
 
     local buttons_h_box = gui.HBox {
         spacing = 0.4,
@@ -166,7 +168,7 @@ rgb_change_color_gui = flow.make_gui(function(player, ctx)
             gui.Field {
                 name = "field_r",
                 label = minetest.colorize("#f00", ServerS(player, "R (Red)")),
-                default = ctx.initial_setup and "" or tostring(ctx.color.r),
+                default = not ctx.initial_setup and tostring(ctx.color.r) or nil,
                 expand = true,
                 on_event = function(player, ctx)
                     ctx.form.field_r = adjust_field_value(ctx.form.field_r)
@@ -176,7 +178,7 @@ rgb_change_color_gui = flow.make_gui(function(player, ctx)
             gui.Field {
                 name = "field_g",
                 label = minetest.colorize("#0f0", ServerS(player, "G (Green)")),
-                default = ctx.initial_setup and "" or tostring(ctx.color.g),
+                default = not ctx.initial_setup and tostring(ctx.color.g) or nil,
                 expand = true,
                 on_event = function(player, ctx)
                     ctx.form.field_g = adjust_field_value(ctx.form.field_g)
@@ -186,7 +188,7 @@ rgb_change_color_gui = flow.make_gui(function(player, ctx)
             gui.Field {
                 name = "field_b",
                 label = minetest.colorize("#00f", ServerS(player, "B (Blue)")),
-                default = ctx.initial_setup and "" or tostring(ctx.color.b),
+                default = not ctx.initial_setup and tostring(ctx.color.b) or nil,
                 expand = true,
                 on_event = function(player, ctx)
                     ctx.form.field_b = adjust_field_value(ctx.form.field_b)

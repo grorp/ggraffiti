@@ -27,7 +27,7 @@ end
 local function spray_can_on_use(item, player)
     local player_name = player:get_player_name()
 
-    local spray_def = item:get_definition()._ggraffiti_spray_can
+    local spray_def = shared.get_raw_spray_def(item)
     if spray_def.rgb then
         spray_def = {
             color = shared.rgb_get_color(item),
@@ -169,8 +169,7 @@ local function spray_step(player)
     end
 
     local item = player:get_wielded_item()
-    local def = item:get_definition()
-    local spray_def = def and def._ggraffiti_spray_can
+    local spray_def = shared.get_raw_spray_def(item)
     if not spray_def then
         player_lasts[player_name] = nil
         return
