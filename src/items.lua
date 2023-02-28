@@ -91,7 +91,8 @@ for _, dye in ipairs(dye.dyes) do
 end
 
 minetest.register_tool("ggraffiti:spray_can_rgb", {
-    description = S("RGB Graffiti Spray Can"),
+    description = S("RGB Graffiti Spray Can") .. "\n" ..
+        S("No color set."),
     inventory_image = "ggraffiti_spray_can_rgb.png",
 
     range = shared.MAX_SPRAY_DISTANCE,

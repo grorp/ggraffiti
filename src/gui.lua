@@ -22,6 +22,11 @@ end
 function shared.rgb_set_color(item, color)
     local meta = item:get_meta()
     meta:set_string("ggraffiti_color", minetest.serialize(color))
+
+    local color_block = minetest.colorize(minetest.colorspec_to_colorstring(color), "█")
+    local desc = S("RGB Graffiti Spray Can") .. "\n" ..
+        color_block .. " " .. S("R: @1, G: @2, B: @3", color.r, color.g, color.b)
+    meta:set_string("description", desc)
 end
 
 local rgb_gui
