@@ -35,4 +35,6 @@ A spray can that removes graffiti. Essentially an eraser.
 
 Source code (everything except image and audio files) available under the [GNU AGPL version 3.0](https://www.gnu.org/licenses/agpl-3.0.html) or any later version, media (image and audio files) available under the [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
 
+`textures/ggraffiti_spray_can.png`, `textures/ggraffiti_spray_can_color.png` and `textures/ggraffiti_spray_can_remover.png` by [Tim79000](https://github.com/Tim79000) ([CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)), modified by Gregor Parzefall
+
 This licensing means, for example, that if you use a modified version of this mod on your server, you must provide the source code of that modified version to your players. For more information, please read the licenses.
