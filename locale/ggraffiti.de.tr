@@ -18,3 +18,24 @@ Graffiti Spray Can (magenta)=Graffiti-Sprühdose (magenta)
 Graffiti Spray Can (pink)=Graffiti-Sprühdose (rosa)
 Red Mushroom Extract=Roter Pilzextrakt
 Graffiti Remover Spray Can=Graffiti-Entferner-Sprühdose
+
+RGB Graffiti Spray Can=RGB-Graffiti-Sprühdose
+No color set.=Keine Farbe festgelegt.
+R: @1, G: @2, B: @3=R: @1, G: @2, B: @3
+
+Color=Farbe
+Change=Ändern
+
+Set color=Farbe festlegen
+Change color=Farbe ändern
+R (Red)=R (Rot)
+G (Green)=G (Grün)
+B (Blue)=B (Blau)
+Values must be integers in the range [0..255].=Werte müssen ganze Zahlen im Bereich [0..255] sein.
+Preview=Vorschau
+Update=Aktualisieren
+Cancel=Abbrechen
+Save=Speichern
+
+Press left mouse button to spray.=Zum Sprühen linke Maustaste drücken.
+Press left mouse button to spray, press right mouse button to configure.=Zum Sprühen linke Maustaste drücken, zum Konfigurieren rechte Maustaste drücken.

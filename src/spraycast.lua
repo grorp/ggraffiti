@@ -79,8 +79,9 @@ function shared.spraycast(player, pos, dir, def)
             end
         end
     else
-        if canvas.bitmap[index] ~= def.color then
-            canvas.bitmap[index] = def.color
+        local color = minetest.colorspec_to_colorstring(def.color)
+        if canvas.bitmap[index] ~= color then
+            canvas.bitmap[index] = color
             canvas:update_later()
         end
     end
