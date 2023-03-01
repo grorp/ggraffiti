@@ -68,7 +68,8 @@ for _, dye in ipairs(dye.dyes) do
     local item_name = "ggraffiti:spray_can_" .. dye_name
 
     minetest.register_tool(item_name, {
-        description = S("Graffiti Spray Can (" .. dye_desc:lower() .. ")"),
+        description = S("Graffiti Spray Can (" .. dye_desc:lower() .. ")") .. "\n" ..
+            S("Press left mouse button to spray."),
         inventory_image = "ggraffiti_spray_can.png^(ggraffiti_spray_can_color.png^[multiply:" .. dye_color .. ")",
 
         range = shared.MAX_SPRAY_DISTANCE,
@@ -92,7 +93,8 @@ end
 
 minetest.register_tool("ggraffiti:spray_can_rgb", {
     description = S("RGB Graffiti Spray Can") .. "\n" ..
-        S("No color set."),
+        S("No color set.") .. "\n" ..
+        S("Press left mouse button to spray, press right mouse button to configure."),
     inventory_image = "ggraffiti_spray_can_rgb.png",
 
     range = shared.MAX_SPRAY_DISTANCE,
@@ -126,7 +128,8 @@ minetest.register_craft({
 })
 
 minetest.register_tool("ggraffiti:spray_can_remover", {
-    description = S("Graffiti Remover Spray Can"),
+    description = S("Graffiti Remover Spray Can") .. "\n" ..
+        S("Press left mouse button to spray."),
     inventory_image = "ggraffiti_spray_can_remover.png",
 
     range = shared.MAX_SPRAY_DISTANCE,

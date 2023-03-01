@@ -25,7 +25,8 @@ function shared.rgb_set_color(item, color)
 
     local color_block = minetest.colorize(minetest.colorspec_to_colorstring(color), "█")
     local desc = S("RGB Graffiti Spray Can") .. "\n" ..
-        color_block .. " " .. S("R: @1, G: @2, B: @3", color.r, color.g, color.b)
+        color_block .. " " .. S("R: @1, G: @2, B: @3", color.r, color.g, color.b) .. "\n" ..
+        S("Press left mouse button to spray, press right mouse button to configure.")
     meta:set_string("description", desc)
 end
 
