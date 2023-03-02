@@ -143,7 +143,7 @@ end
 -- I intentionally do not remove floating graffiti in on_activate, as I think
 -- that this would only make the behavior even more inconsistent and thus even
 -- more confusing.
-minetest.register_on_dignode(function(pos, oldnode, digger)
+minetest.register_on_dignode(function(pos)
     local objs = minetest.get_objects_in_area(
         pos - vector.new(4, 4, 4), -- arbitrary
         pos + vector.new(4, 4, 4)
