@@ -41,7 +41,7 @@ local function validate_staticdata(data)
 end
 
 function CanvasEntity:on_activate(staticdata)
-    self.object:set_armor_groups({immortal = 1})
+    self.object:set_armor_groups({ immortal = 1 })
 
     -- https://github.com/minetest/minetest/blob/5.6.1/src/script/cpp_api/s_entity.cpp#L77-L104
     assert(type(staticdata) == "string")

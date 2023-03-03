@@ -41,7 +41,7 @@ local function spray_can_on_use(item, player)
     local pos = get_eye_pos(player)
     local dir = player:get_look_dir()
     shared.spraycast(player, pos, dir, spray_def)
-    player_lasts[player_name] = {pos = pos, dir = dir}
+    player_lasts[player_name] = { pos = pos, dir = dir }
 
     item = wear_out(player_name, item, 1)
     return item
@@ -58,34 +58,31 @@ minetest.register_craftitem("ggraffiti:spray_can_empty", { -- stackable
     range = shared.MAX_SPRAY_DISTANCE,
     on_use = function() end,
 
-    groups = {ggraffiti_spray_can = 1, tool = 1},
+    groups = { ggraffiti_spray_can = 1, tool = shared.game == "mtg" and 1 or nil },
 })
 
-for _, dye in ipairs(dye.dyes) do
-    local dye_name, dye_desc = unpack(dye)
-    local dye_color = shared.DYE_COLORS[dye_name]
-
-    local item_name = "ggraffiti:spray_can_" .. dye_name
+for _, dye in ipairs(shared.game_dyes) do
+    local item_name = "ggraffiti:spray_can_" .. dye.name
 
     minetest.register_tool(item_name, {
-        description = S("Graffiti Spray Can (" .. dye_desc:lower() .. ")") .. "\n" ..
+        description = S("Graffiti Spray Can (" .. dye.desc .. ")") .. "\n" ..
             S("Press left mouse button to spray."),
-        inventory_image = "ggraffiti_spray_can.png^(ggraffiti_spray_can_color.png^[multiply:" .. dye_color .. ")",
+        inventory_image = "ggraffiti_spray_can.png^(ggraffiti_spray_can_color.png^[multiply:" .. dye.color .. ")",
 
         range = shared.MAX_SPRAY_DISTANCE,
         on_use = spray_can_on_use,
         _ggraffiti_spray_can = {
-            color = dye_color,
+            color = dye.color,
         },
 
-        groups = {ggraffiti_spray_can = 1},
+        groups = { ggraffiti_spray_can = 1 },
     })
 
     minetest.register_craft({
         recipe = {
-            {"default:steel_ingot"},
-            {"dye:" .. dye_name},
-            {"default:steel_ingot"},
+            { shared.game_items.iron_ingot },
+            { dye.item_name                },
+            { shared.game_items.iron_ingot },
         },
         output = item_name,
     })
@@ -105,14 +102,14 @@ minetest.register_tool("ggraffiti:spray_can_rgb", {
     on_place = spray_can_rgb_on_place,
     on_secondary_use = spray_can_rgb_on_place,
 
-    groups = {ggraffiti_spray_can = 1},
+    groups = { ggraffiti_spray_can = 1 },
 })
 
 minetest.register_craft({
     recipe = {
-        {"",        "default:steel_ingot", ""        },
-        {"dye:red", "dye:green",           "dye:blue"},
-        {"",        "default:steel_ingot", ""        },
+        { "",                        shared.game_items.iron_ingot, ""                         },
+        { shared.game_items.red_dye, shared.game_items.green_dye,  shared.game_items.blue_dye },
+        { "",                        shared.game_items.iron_ingot, ""                         },
     },
     output = "ggraffiti:spray_can_rgb",
 })
@@ -120,11 +117,12 @@ minetest.register_craft({
 minetest.register_craftitem("ggraffiti:mushroom_red_extract", {
     description = S("Red Mushroom Extract"),
     inventory_image = "ggraffiti_mushroom_red_extract.png",
+    groups = { craftitem = shared.game == "mcl" and 1 or nil },
 })
 
 minetest.register_craft({
-    recipe = {{"flowers:mushroom_red"}},
-    output = "ggraffiti:mushroom_red_extract 4",
+    recipe = {{ shared.game_items.red_mushroom }},
+    output = "ggraffiti:mushroom_red_extract " .. shared.game_items.red_mushroom_extract_count,
 })
 
 minetest.register_tool("ggraffiti:spray_can_remover", {
@@ -138,16 +136,16 @@ minetest.register_tool("ggraffiti:spray_can_remover", {
         remover = true,
     },
 
-    groups = {ggraffiti_spray_can = 1},
+    groups = { ggraffiti_spray_can = 1 },
 })
 
 minetest.register_alias("ggraffiti:spray_can_anti", "ggraffiti:spray_can_remover")
 
 minetest.register_craft({
     recipe = {
-        {"default:steel_ingot"},
-        {"ggraffiti:mushroom_red_extract"},
-        {"default:steel_ingot"},
+        { shared.game_items.iron_ingot          },
+        { "ggraffiti:mushroom_red_extract"      },
+        { shared.game_items.iron_ingot          },
     },
     output = "ggraffiti:spray_can_remover",
 })
@@ -155,7 +153,7 @@ minetest.register_craft({
 minetest.register_craft({
     type = "cooking",
     recipe = "group:ggraffiti_spray_can",
-    output = "default:steel_ingot 2",
+    output = shared.game_items.iron_ingot .. " 2",
 })
 
 local function lerp_factory(t)
@@ -212,7 +210,7 @@ local function spray_step(player)
         end
     end
 
-    player_lasts[player_name] = {pos = now_pos, dir = now_dir}
+    player_lasts[player_name] = { pos = now_pos, dir = now_dir }
 end
 
 local dtime_accu = 0

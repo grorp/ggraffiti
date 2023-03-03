@@ -51,7 +51,7 @@ function shared.spraycast(player, pos, dir, def)
         local obj = minetest.add_entity(canvas_pos, "ggraffiti:canvas")
         obj:set_rotation(canvas_rot)
         canvas = obj:get_luaentity()
-        canvas:setup(node_pos, {x = rot_box_size.x, y = rot_box_size.y})
+        canvas:setup(node_pos, { x = rot_box_size.x, y = rot_box_size.y })
         canvas:update_immediately() -- Avoid flash of "no texture" texture.
     end
 
