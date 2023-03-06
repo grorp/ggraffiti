@@ -165,7 +165,8 @@ end
 local function spray_step(player)
     local player_name = player:get_player_name()
 
-    if not player:get_player_control().dig then
+    if not minetest.check_player_privs(player_name, "interact") or
+            not player:get_player_control().dig then
         player_lasts[player_name] = nil
         return
     end
