@@ -8,15 +8,13 @@ This Minetest mod adds graffiti that lets you paint whatever you want on any nod
 
 [More screenshots](./SCREENSHOTS.md)
 
-Changes in `v1.0.0-alpha.9`:
+Features:
 
-- Addition of the "RGB Graffiti Spray Can"
-- New textures by Tim79000
-
-Changes in `v1.0.0-alpha.8`:
-
-- Graffiti is now removed when you dig the node it is attached to.
-- Performance improvements
+- Paint pixel-by-pixel on any node
+- Paint in any color with the RGB spray can
+- Remove graffiti with the eraser-like "remover" spray can or by digging the sprayed nodes
+- Respects protection mods
+- Compatible with Minetest Game and MineClone 2
 
 This mod is a Work in Progress.
 
@@ -24,7 +22,7 @@ This mod is a Work in Progress.
 
 **Graffiti Spray Can**
 
-![](./docpics/recipe_spray_can.png)
+![](./docpics/recipe_spray_can_mtg.png)
 
 Press and hold the dig button (usually the left mouse button) to paint. After some time, the spray can will be empty. You can smelt spray cans, empty or not, to get the two steel ingots back. Of course, you can replace the cyan dye in the recipe with any dye you like.
 
@@ -32,21 +30,37 @@ If you are playing on Android: For the best spraying experience, enable `Setting
 
 **RGB Graffiti Spray Can**
 
-![](./docpics/recipe_rgb_spray_can.png)
+![](./docpics/recipe_rgb_spray_can_mtg.png)
 
 A spray can that can paint in any 24-bit RGB color and thus in all colors supported by Minetest. Press the place button (usually the right mouse button) to change the selected color.
 
 **Red Mushroom Extract**
 
-![](./docpics/recipe_red_mushroom_extract.png)
+![](./docpics/recipe_red_mushroom_extract_mtg.png)
 
 **Graffiti Remover Spray Can**
 
-![](./docpics/recipe_remover_spray_can.png)
+![](./docpics/recipe_remover_spray_can_mtg.png)
 
 A spray can that removes graffiti. Essentially an eraser.
 
 If you want to remove a lot of graffiti at once, you can simply dig the affected nodes and place them again. This will remove all graffiti that is on them.
+
+## Changelog
+
+`v1.0.0-alpha.10` (Mar 12, 2023)
+
+- Support for MineClone 2
+
+`v1.0.0-alpha.9` (Mar 4, 2023)
+
+- Addition of the "RGB Graffiti Spray Can"
+- New textures that were contributed by Tim79000
+
+`v1.0.0-alpha.8` (Feb 24, 2023)
+
+- Graffiti is now removed when you dig the node it is attached to.
+- Performance improvements
 
 ## License
 
