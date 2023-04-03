@@ -162,6 +162,31 @@ local function lerp_factory(t)
     end
 end
 
+local function fast_new(x, y, z)
+	return setmetatable({x = x, y = y, z = z}, metatable)
+end
+
+-- Needed for compatibility with versions of minetest from before
+-- vector.combine() was added (5.6.0)
+local function vector_combine(a, b, func)
+	return fast_new(
+		func(a.x, b.x),
+		func(a.y, b.y),
+		func(a.z, b.z)
+	)
+end
+
+-- Needed for compatibility with versions of minetest from before
+-- vector.normalize() was added (5.6.0)
+function normalize(v)
+	local len = vector.length(v)
+	if len == 0 then
+		return fast_new(0, 0, 0)
+	else
+		return vector.divide(v, len)
+	end
+end
+
 local function spray_step(player)
     local player_name = player:get_player_name()
 
@@ -203,8 +228,8 @@ local function spray_step(player)
         else
             for step_n = 1, n_steps do
                 local lerp = lerp_factory(step_n / n_steps)
-                local pos = vector.combine(last.pos, now_pos, lerp)
-                local dir = vector.combine(last.dir, now_dir, lerp):normalize() -- "nlerp"
+                local pos = vector_combine(last.pos, now_pos, lerp)
+                local dir = normalize(vector_combine(last.dir, now_dir, lerp)) -- "nlerp"
 
                 shared.spraycast(player, pos, dir, spray_def)
             end
