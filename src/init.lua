@@ -19,7 +19,7 @@ else
     )
 end
 
-if not modlib.minetest.get_node_selectionboxes then
+if not modlib.version or modlib.version < 102 then
     error(
         '\n' ..
         'GGraffiti\n' ..
