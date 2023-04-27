@@ -42,6 +42,7 @@ local function spray_can_on_use(item, player)
     local dir = player:get_look_dir()
     shared.spraycast(player, pos, dir, spray_def)
     player_lasts[player_name] = { pos = pos, dir = dir }
+    shared.update_canvases()
 
     item = wear_out(player_name, item, 1)
     return item
