@@ -100,9 +100,7 @@ function shared.spraycast(player, pos, dir, def)
 
     local canvas_pos = node_pos + box_center + vector.new(0, 0, rot_box_size.z * 0.501):rotate(canvas_rot)
 
-    -- TODO: Only create canvases if we're not currently removing graffiti
-    -- (probably requires a major refactor of the rectangle spreading code)
-    -- (Update: The major refactor is done now 🎉)
+    -- TODO: Only create canvases if we're not currently removing graffiti.
     local canvas = find_canvas(canvas_pos)
     if not canvas and not (def.remover and def.size == 1) then
         local canvas_size = { x = rot_box_size.x, y = rot_box_size.y }
