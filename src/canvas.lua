@@ -67,7 +67,7 @@ function CanvasEntity:on_activate(staticdata)
         self:update_immediately()
 
         -- "Overwrite" other canvases in the same place.
-        local rivals = minetest.get_objects_inside_radius(self.object:get_pos(), 0.0001)
+        local rivals = minetest.get_objects_inside_radius(self.object:get_pos(), shared.EPSILON)
         for _, obj in ipairs(rivals) do
             if obj ~= self.object then
                 local ent = obj:get_luaentity()
@@ -79,13 +79,11 @@ function CanvasEntity:on_activate(staticdata)
     end
 end
 
-function CanvasEntity:setup(node_pos, size)
+function CanvasEntity:setup(node_pos, size, bitmap_size)
     self.node_offset = node_pos - self.object:get_pos()
     self.size = size
-    self.bitmap_size = {
-        x = math.max(math.round(self.size.x / shared.DESIRED_PIXEL_SIZE), 1), -- minimum 1x1 pixels
-        y = math.max(math.round(self.size.y / shared.DESIRED_PIXEL_SIZE), 1),
-    }
+    self.bitmap_size = bitmap_size
+
     self.bitmap = {}
     for i = 1, self.bitmap_size.x * self.bitmap_size.y do
         self.bitmap[i] = shared.TRANSPARENT
@@ -129,6 +127,12 @@ function CanvasEntity:get_staticdata()
     })
 end
 
+function CanvasEntity:get_node_pos()
+    if self.node_offset then
+        return (self.object:get_pos() + self.node_offset):apply(math.round)
+    end
+end
+
 minetest.register_entity("ggraffiti:canvas", CanvasEntity)
 
 function shared.update_canvases()
@@ -150,9 +154,9 @@ minetest.register_on_dignode(function(pos)
     )
     for _, obj in ipairs(objs) do
         local ent = obj:get_luaentity()
-        if ent and ent.name == "ggraffiti:canvas" and ent.node_offset then
-            local node_pos = (obj:get_pos() + ent.node_offset):apply(math.round)
-            if node_pos == pos then
+        if ent and ent.name == "ggraffiti:canvas" then
+            local node_pos = ent:get_node_pos()
+            if pos == node_pos then -- fancy overloaded `==` operator
                 obj:remove()
             end
         end

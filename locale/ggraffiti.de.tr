@@ -1,8 +1,6 @@
 # textdomain: ggraffiti
 
 Empty Spray Can=Leere Sprühdose
-Red Mushroom Extract=Roter Pilzextrakt
-Graffiti Remover Spray Can=Graffiti-Entferner-Sprühdose
 
 Graffiti Spray Can (White)=Graffiti-Sprühdose (Weiß)
 Graffiti Spray Can (Grey)=Graffiti-Sprühdose (Grau)
@@ -23,20 +21,30 @@ Graffiti Spray Can (Pink)=Graffiti-Sprühdose (Rosa)
 Graffiti Spray Can (Light Grey)=Graffiti-Sprühdose (Hellgrau)
 Graffiti Spray Can (Purple)=Graffiti-Sprühdose (Violett)
 Graffiti Spray Can (Light Blue)=Graffiti-Sprühdose (Hellblau)
-Graffiti Spray Can (Cactus Green)=Graffiti-Sprühdose (Kaktusgrün)
 Graffiti Spray Can (Lime)=Graffiti-Sprühdose (Lindgrün)
-Graffiti Spray Can (Dandelion Yellow)=Graffiti-Sprühdose (Löwenzahngelb)
-Graffiti Spray Can (Rose Red)=Graffiti-Sprühdose (Rosenrot)
 
 RGB Graffiti Spray Can=RGB-Graffiti-Sprühdose
+Red Mushroom Extract=Roter Pilzextrakt
+Graffiti Remover Spray Can=Graffiti-Entferner-Sprühdose
+
+Left-click to spray, right-click to configure.=Linksklick zum Sprühen, Rechtsklick zum Konfigurieren.
 No color set.=Keine Farbe festgelegt.
-R: @1, G: @2, B: @3=R: @1, G: @2, B: @3
+Color: =Farbe: 
+ @1, @2, @3= @1, @2, @3
+Size: @1=Größe: @1
+
+Set Color=Farbe festlegen
+Change Color=Farbe ändern
+Change Size=Größe ändern
+[Experimental]=[Experimentell]
 
 Color=Farbe
+R: @1, G: @2, B: @3=R: @1, G: @2, B: @3
+Size=Größe
+1 pixel=1 Pixel
+@1 pixels=@1 Pixel
 Change=Ändern
 
-Set color=Farbe festlegen
-Change color=Farbe ändern
 R (Red)=R (Rot)
 G (Green)=G (Grün)
 B (Blue)=B (Blau)
@@ -45,6 +53,3 @@ Preview=Vorschau
 Update=Aktualisieren
 Cancel=Abbrechen
 Save=Speichern
-
-Press left mouse button to spray.=Zum Sprühen linke Maustaste drücken.
-Press left mouse button to spray, press right mouse button to configure.=Zum Sprühen linke Maustaste drücken, zum Konfigurieren rechte Maustaste drücken.

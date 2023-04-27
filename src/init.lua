@@ -31,7 +31,8 @@ if not modlib.version or modlib.version < 102 then
     )
 end
 
-shared.SPRAY_DURATION = 4 * 60
+-- For the largest available spray size (5×5=25 pixels), this results in 12 seconds.
+shared.SPRAY_DURATION = 5 * 60
 -- Clients send the position of their player every 0.1 seconds.
 -- https://github.com/minetest/minetest/blob/5.6.1/src/client/client.h#L563
 -- https://github.com/minetest/minetest/blob/5.6.1/src/client/client.cpp#L528
@@ -39,10 +40,10 @@ shared.SPRAY_STEP_INTERVAL = 0.1
 shared.NUM_SPRAY_STEPS = 5
 
 shared.MAX_SPRAY_DISTANCE = 4
-
 shared.DESIRED_PIXEL_SIZE = 1/16
-
 shared.TRANSPARENT = "#00000000"
+
+shared.EPSILON = 0.0001
 
 if shared.game == "mtg" then
     -- Creative inventory concept:
@@ -100,12 +101,12 @@ elseif shared.game == "mcl" then
         { item_name = "mcl_dye:blue", name = "blue", desc = "Blue", color = "#84a4d3" },
         { item_name = "mcl_dye:lightblue", name = "lightblue", desc = "Light Blue", color = "#56c4ff" },
         { item_name = "mcl_dye:cyan", name = "cyan", desc = "Cyan", color = "#61ccad" },
-        { item_name = "mcl_dye:dark_green", name = "dark_green", desc = "Cactus Green", color = "#238231" },
+        { item_name = "mcl_dye:dark_green", name = "dark_green", desc = "Green", color = "#238231" },
         { item_name = "mcl_dye:green", name = "green", desc = "Lime", color = "#7fe07d" },
-        { item_name = "mcl_dye:yellow", name = "yellow", desc = "Dandelion Yellow", color = "#fae54d" },
+        { item_name = "mcl_dye:yellow", name = "yellow", desc = "Yellow", color = "#fae54d" },
         { item_name = "mcl_dye:brown", name = "brown", desc = "Brown", color = "#c9804d" },
         { item_name = "mcl_dye:orange", name = "orange", desc = "Orange", color = "#f2aa4d" },
-        { item_name = "mcl_dye:red", name = "red", desc = "Rose Red", color = "#a5413a" },
+        { item_name = "mcl_dye:red", name = "red", desc = "Red", color = "#a5413a" },
         { item_name = "mcl_dye:magenta", name = "magenta", desc = "Magenta", color = "#a06bad" },
         { item_name = "mcl_dye:pink", name = "pink", desc = "Pink", color = "#e07dc1" },
     }
