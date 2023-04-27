@@ -240,15 +240,15 @@ end
 
 local dtime_accu = 0
 
-local deltas = {}
-local delta_index = 1
+-- local deltas = {}
+-- local delta_index = 1
 
 minetest.register_globalstep(function(dtime)
     dtime_accu = dtime_accu + dtime
 
     if dtime_accu >= shared.SPRAY_STEP_INTERVAL then
-        shared.profiler_someone_spraying = false
-        local t1 = minetest.get_us_time()
+        -- shared.profiler_someone_spraying = false
+        -- local t1 = minetest.get_us_time()
 
         dtime_accu = dtime_accu % shared.SPRAY_STEP_INTERVAL
         for _, player in ipairs(minetest.get_connected_players()) do
@@ -256,22 +256,22 @@ minetest.register_globalstep(function(dtime)
         end
         shared.after_spraycasts()
 
-        if shared.profiler_someone_spraying then
-            local t2 = minetest.get_us_time()
-            deltas[delta_index] = (t2 - t1) / 1000
-            delta_index = delta_index + 1
-            if delta_index > 100000 then
-                delta_index = 1
-            end
+        -- if shared.profiler_someone_spraying then
+        --     local t2 = minetest.get_us_time()
+        --     deltas[delta_index] = (t2 - t1) / 1000
+        --     delta_index = delta_index + 1
+        --     if delta_index > 100000 then
+        --         delta_index = 1
+        --     end
 
-            local avg = 0
-            local div = 0
-            for _, v in ipairs(deltas) do
-                avg = avg + v
-                div = div + 1
-            end
-            avg = avg / div
-            print(string.format("[ggraffiti] average spray step time: %.6f ms", avg))
-        end
+        --     local avg = 0
+        --     local div = 0
+        --     for _, v in ipairs(deltas) do
+        --         avg = avg + v
+        --         div = div + 1
+        --     end
+        --     avg = avg / div
+        --     print(string.format("[ggraffiti] average spray step time: %.6f ms", avg))
+        -- end
     end
 end)

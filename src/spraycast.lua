@@ -161,7 +161,7 @@ function shared.spraycast(player, pos, dir, def)
         end
     end
 
-    shared.profiler_someone_spraying = true
+    -- shared.profiler_someone_spraying = true
 end
 
 local function clamp(val, min, max)
