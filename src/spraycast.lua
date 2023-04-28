@@ -32,6 +32,14 @@ local function get_node_selectionboxes_cached(pos)
     return new_result
 end
 
+local function vector_length_sq(v)
+	return v.x * v.x + v.y * v.y + v.z * v.z
+end
+
+local function nearly_equal(a, b)
+    return math.abs(a - b) < shared.EPSILON
+end
+
 local function calc_bitmap_size(canvas_size)
     return { -- minimum 1x1 pixels
         x = math.max(math.round(canvas_size.x / shared.DESIRED_PIXEL_SIZE), 1),
@@ -76,7 +84,11 @@ function shared.spraycast(player, pos, dir, def)
             break
         end
     end
-    if not pthing or pthing.type ~= "node" then return end
+    if not pthing or pthing.type ~= "node" or
+            -- `pthing.intersection_normal == vector.zero()` if you're inside a node
+            not nearly_equal(vector_length_sq(pthing.intersection_normal), 1) then
+        return
+    end
 
     local node_pos = pthing.under
     local player_name = player:get_player_name()
@@ -112,11 +124,10 @@ function shared.spraycast(player, pos, dir, def)
 
     local root_pos = node_pos + box_center + vector.new(0, 0, rot_box_size.z * 0.5):rotate(canvas_rot)
     local pointed_pos = pthing.intersection_point
-    local distance = pointed_pos - root_pos
 
     -- 2D (Z is always zero)
     local pos_on_canvas = vector.new(rot_box_size.x / 2, rot_box_size.y / 2, 0) +
-        vec_to_canvas_space(distance, canvas_rot)
+        vec_to_canvas_space(pointed_pos - root_pos, canvas_rot)
 
     local pos_on_bitmap_x = pos_on_canvas.x / rot_box_size.x * canvas.bitmap_size.x
     local pos_on_bitmap_y = pos_on_canvas.y / rot_box_size.y * canvas.bitmap_size.y
@@ -232,10 +243,6 @@ spread_rect_to_node = function(props, self_root_pos_canvas, other_node_pos)
             spread_rect_to_box(props, self_root_pos_canvas, other_node_pos, raw_box)
         end
     end
-end
-
-local function nearly_equal(a, b)
-    return math.abs(a - b) < shared.EPSILON
 end
 
 spread_rect_to_box = function(props, self_root_pos_canvas, other_node_pos, raw_box)
