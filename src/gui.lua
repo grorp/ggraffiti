@@ -81,13 +81,11 @@ local function get_gui_size_str(player, size)
 end
 
 gui_configure = flow.make_gui(function(player, ctx)
-    local built = gui.VBox {
+    return gui.VBox {
         padding = 0.4,
         spacing = 0.4,
         gui.label { label = ServerSDouble(player, ctx.item_desc) },
-    }
-    if ctx.rgb_color then
-        table.insert(built, gui.HBox {
+        ctx.rgb_color and gui.HBox {
             spacing = 0.4,
             gui.VBox {
                 spacing = 0,
@@ -115,32 +113,31 @@ gui_configure = flow.make_gui(function(player, ctx)
                     })
                 end,
             },
-        })
-    end
-    table.insert(built, gui.HBox {
-        spacing = 0.4,
-        gui.VBox {
-            spacing = 0,
-            expand = true,
-            align_h = "left",
-            gui.Label {
-                label = ServerS(player, "Size") .. " " .. get_gui_experimental_str(player),
+        } or gui.Nil {},
+        gui.HBox {
+            spacing = 0.4,
+            gui.VBox {
+                spacing = 0,
+                expand = true,
+                align_h = "left",
+                gui.Label {
+                    label = ServerS(player, "Size") .. " " .. get_gui_experimental_str(player),
+                },
+                gui.Label { label = get_gui_size_str(player, ctx.size) },
             },
-            gui.Label { label = get_gui_size_str(player, ctx.size) },
+            gui.Button {
+                label = ServerS(player, "Change"),
+                on_event = function(player, ctx)
+                    gui_change_size:show(player, {
+                        item_name = ctx.item_name,
+                        item_desc = ctx.item_desc,
+                        rgb_color = ctx.rgb_color,
+                        size = ctx.size,
+                    })
+                end,
+            },
         },
-        gui.Button {
-            label = ServerS(player, "Change"),
-            on_event = function(player, ctx)
-                gui_change_size:show(player, {
-                    item_name = ctx.item_name,
-                    item_desc = ctx.item_desc,
-                    rgb_color = ctx.rgb_color,
-                    size = ctx.size,
-                })
-            end,
-        },
-    })
-    return built
+    }
 end)
 
 local function adjust_field_value(val)
@@ -220,41 +217,6 @@ gui_change_rgb_color = flow.make_gui(function(player, ctx)
         }
     end
 
-    local preview_h_box = gui.HBox {
-        spacing = 0.4,
-    }
-    if png_color then
-        table.insert(preview_h_box, gui.Image {
-            w = 0.8,
-            h = 0.8,
-            expand = true,
-            align_h = "fill",
-            texture_name = make_color_texture(png_color),
-        })
-    end
-    table.insert(preview_h_box, gui.Button {
-        label = ServerS(player, "Update"),
-        expand = not png_color or nil,
-        align_h = not png_color and "right" or nil,
-        -- no on_event needed
-    })
-
-    local buttons_h_box = gui.HBox {
-        spacing = 0.4,
-    }
-    if not ctx.initial_setup then
-        table.insert(buttons_h_box, gui.Button {
-            label = ServerS(player, "Cancel"),
-            expand = true,
-            on_event = cancel_button_on_event,
-        })
-    end
-    table.insert(buttons_h_box, gui.Button {
-        label = ServerS(player, "Save"),
-        expand = true,
-        on_event = change_rgb_color_save_button_on_event,
-    })
-
     return gui.VBox {
         padding = 0.4,
         spacing = 0.4,
@@ -300,9 +262,36 @@ gui_change_rgb_color = flow.make_gui(function(player, ctx)
         gui.VBox {
             spacing = 0,
             gui.Label { label = ServerS(player, "Preview") },
-            preview_h_box,
+            gui.HBox {
+                spacing = 0.4,
+                png_color and gui.Image {
+                    w = 0.8,
+                    h = 0.8,
+                    expand = true,
+                    align_h = "fill",
+                    texture_name = make_color_texture(png_color),
+                } or gui.Nil {},
+                gui.Button {
+                    label = ServerS(player, "Update"),
+                    expand = not png_color or nil,
+                    align_h = not png_color and "right" or nil,
+                    -- no on_event needed
+                },
+            },
         },
-        buttons_h_box,
+        gui.HBox {
+            spacing = 0.4,
+            ctx.initial_setup and gui.Nil {} or gui.Button {
+                label = ServerS(player, "Cancel"),
+                expand = true,
+                on_event = cancel_button_on_event,
+            },
+            gui.Button {
+                label = ServerS(player, "Save"),
+                expand = true,
+                on_event = change_rgb_color_save_button_on_event,
+            },
+        },
     }
 end)
 
