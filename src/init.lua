@@ -19,16 +19,22 @@ else
     )
 end
 
-if not modlib.version or modlib.version < 102 then
+local function dependency_version_error(mod_title)
     error(
         '\n' ..
         'GGraffiti\n' ..
         "────────────────────────────────────────────────────────────────────────────────────────────────────\n" ..
-        'You have an outdated version of the mod "Modding Library" installed. ' ..
-        'Please go to "Content" → "Browse online content" and update the mod "Modding Library".\n' ..
+        'You have an outdated version of the mod "' .. mod_title .. '" installed. ' ..
+        'Please go to "Content" → "Browse online content" and update the mod "' .. mod_title .. '".\n' ..
         "────────────────────────────────────────────────────────────────────────────────────────────────────\n",
         0
     )
+end
+if not modlib.version or modlib.version < 102 then
+    dependency_version_error("Modding Library")
+end
+if not flow.widgets or not rawget(flow.widgets, "Nil") then
+    dependency_version_error("Flow")
 end
 
 -- For the largest available spray size (5×5=25 pixels), this results in 12 seconds.
