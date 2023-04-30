@@ -92,6 +92,8 @@ function shared.spraycast(player, pos, dir, def)
 
     local node_pos = pthing.under
     local player_name = player:get_player_name()
+    -- TODO: Allow rect spreading to unprotected nodes even if the pointed node
+    -- is protected.
     if is_protected_cached(node_pos, player_name) then
         return
     end
@@ -109,18 +111,18 @@ function shared.spraycast(player, pos, dir, def)
     )
     rot_box:repair()
     local rot_box_size = rot_box:get_size()
+    local bitmap_size = calc_bitmap_size(rot_box_size)
 
     local canvas_pos = node_pos + box_center + vector.new(0, 0, rot_box_size.z * 0.501):rotate(canvas_rot)
 
-    -- TODO: Only create canvases if we're not currently removing graffiti.
     local canvas = find_canvas(canvas_pos)
-    if not canvas and not (def.remover and def.size == 1) then
+    if not canvas and not def.remover then
         local canvas_size = { x = rot_box_size.x, y = rot_box_size.y }
-        local bitmap_size = calc_bitmap_size(canvas_size)
         canvas = create_canvas(
             node_pos, canvas_pos, canvas_rot, canvas_size, bitmap_size)
+        if not canvas then return end -- This is actually an error.
     end
-    if not canvas then return end
+    if not canvas and def.size == 1 then return end
 
     local root_pos = node_pos + box_center + vector.new(0, 0, rot_box_size.z * 0.5):rotate(canvas_rot)
     local pointed_pos = pthing.intersection_point
@@ -129,13 +131,13 @@ function shared.spraycast(player, pos, dir, def)
     local pos_on_canvas = vector.new(rot_box_size.x / 2, rot_box_size.y / 2, 0) +
         vec_to_canvas_space(pointed_pos - root_pos, canvas_rot)
 
-    local pos_on_bitmap_x = pos_on_canvas.x / rot_box_size.x * canvas.bitmap_size.x
-    local pos_on_bitmap_y = pos_on_canvas.y / rot_box_size.y * canvas.bitmap_size.y
+    local pos_on_bitmap_x = pos_on_canvas.x / rot_box_size.x * bitmap_size.x
+    local pos_on_bitmap_y = pos_on_canvas.y / rot_box_size.y * bitmap_size.y
 
     local color = def.remover and shared.TRANSPARENT or def.color
 
     if def.size == 1 then
-        local index = math.floor(pos_on_bitmap_y) * canvas.bitmap_size.x + math.floor(pos_on_bitmap_x) + 1
+        local index = math.floor(pos_on_bitmap_y) * bitmap_size.x + math.floor(pos_on_bitmap_x) + 1
 
         if canvas.bitmap[index] ~= color then
             canvas.bitmap[index] = color
@@ -147,26 +149,35 @@ function shared.spraycast(player, pos, dir, def)
             end
         end
     else
-        draw_rect(canvas, {
-            player = player,
-            self_node_pos = node_pos,
-            self_root_pos = root_pos,
-            self_rot = canvas_rot,
-            self_size = canvas.size,
-            skip_box_index = pthing.box_id,
+        local rect_x = math.round(pos_on_bitmap_x - def.size / 2)
+        local rect_y = math.round(pos_on_bitmap_y - def.size / 2)
 
-            x = math.round(pos_on_bitmap_x - def.size / 2),
-            y = math.round(pos_on_bitmap_y - def.size / 2),
-            width = def.size,
-            height = def.size,
-            color = color,
-            remover = def.remover,
-        })
+        if canvas then
+            draw_rect(canvas, {
+                x = rect_x,
+                y = rect_y,
+                size = def.size,
+                color = color,
+                remover = def.remover,
+            })
+        end
 
-        if def.remover and canvas:is_empty() then
-            canvas.object:remove()
-        else
-            canvas:update_later()
+        if rect_x < 0 or rect_x + def.size - 1 > bitmap_size.x - 1 or
+                rect_y < 0 or rect_y + def.size - 1 > bitmap_size.y - 1 then
+            spread_rect({
+                player = player,
+                self_node_pos = node_pos,
+                self_root_pos = root_pos,
+                self_rot = canvas_rot,
+                self_rot_box_size = rot_box_size,
+                skip_box_index = pthing.box_id,
+
+                x = rect_x,
+                y = rect_y,
+                size = def.size,
+                color = color,
+                remover = def.remover,
+            })
         end
     end
 
@@ -177,22 +188,15 @@ local function clamp(val, min, max)
     return math.min(math.max(val, min), max)
 end
 
-draw_rect = function(canvas, props, do_not_spread)
-    local x1_tgt, y1_tgt =
-        props.x,
-        props.y
-    local x2_tgt, y2_tgt =
-        props.x + props.width - 1,
-        props.y + props.height - 1
-
+draw_rect = function(canvas, props)
     local max_x = canvas.bitmap_size.x - 1
     local max_y = canvas.bitmap_size.y - 1
     local x1, y1 =
-        clamp(x1_tgt, 0, max_x),
-        clamp(y1_tgt, 0, max_y)
+        clamp(props.x, 0, max_x),
+        clamp(props.y, 0, max_y)
     local x2, y2 =
-        clamp(x2_tgt, 0, max_x),
-        clamp(y2_tgt, 0, max_y)
+        clamp(props.x + props.size - 1, 0, max_x),
+        clamp(props.y + props.size - 1, 0, max_y)
 
     for xx = x1, x2 do
         for yy = y1, y2 do
@@ -200,9 +204,10 @@ draw_rect = function(canvas, props, do_not_spread)
         end
     end
 
-    if not do_not_spread and
-            (x1 ~= x1_tgt or y1 ~= y1_tgt or x2 ~= x2_tgt or y2 ~= y2_tgt) then
-        spread_rect(props)
+    if props.remover and canvas:is_empty() then
+        canvas.object:remove()
+    else
+        canvas:update_later()
     end
 end
 
@@ -264,9 +269,8 @@ spread_rect_to_box = function(props, self_root_pos_canvas, other_node_pos, raw_b
         return
     end
 
-    local self_size_vec = vector.new(props.self_size.x, props.self_size.y, 0)
     -- The Z value of this vector is never used.
-    local canvas_offset = (self_root_pos_canvas - self_size_vec / 2) -
+    local canvas_offset = (self_root_pos_canvas - props.self_rot_box_size / 2) -
         (other_root_pos_canvas - rot_box_size / 2)
     local bitmap_offset_x = math.round(canvas_offset.x / shared.DESIRED_PIXEL_SIZE)
     local bitmap_offset_y = math.round(canvas_offset.y / shared.DESIRED_PIXEL_SIZE)
@@ -275,8 +279,8 @@ spread_rect_to_box = function(props, self_root_pos_canvas, other_node_pos, raw_b
     local new_y = bitmap_offset_y + props.y
 
     local bitmap_size = calc_bitmap_size(rot_box_size)
-    if new_x + props.width - 1 < 0 or
-            new_y + props.height - 1 < 0 or
+    if new_x + props.size - 1 < 0 or
+            new_y + props.size - 1 < 0 or
             new_x > bitmap_size.x - 1 or
             new_y > bitmap_size.y - 1 then
         return
@@ -295,16 +299,11 @@ spread_rect_to_box = function(props, self_root_pos_canvas, other_node_pos, raw_b
     local lessprops_new = {
         x = new_x,
         y = new_y,
-        width = props.width,
-        height = props.height,
+        size = props.size,
         color = props.color,
+        remover = props.remover,
     }
-    draw_rect(canvas, lessprops_new, true)
-    if props.remover and canvas:is_empty() then
-        canvas.object:remove()
-    else
-        canvas:update_later()
-    end
+    draw_rect(canvas, lessprops_new)
 end
 
 function shared.after_spraycasts()
