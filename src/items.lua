@@ -82,6 +82,10 @@ minetest.register_craftitem("ggraffiti:spray_can_empty", { -- stackable
     groups = { ggraffiti_spray_can = 1, tool = shared.game == "mtg" and 1 or nil },
 })
 
+function shared.get_colored_can_texmod(color)
+    return "ggraffiti_spray_can.png^(ggraffiti_spray_can_color.png^[multiply:" .. color .. ")"
+end
+
 for _, dye in ipairs(shared.game_dyes) do
     local item_name = "ggraffiti:spray_can_" .. dye.name
 
@@ -89,7 +93,7 @@ for _, dye in ipairs(shared.game_dyes) do
         description = S("Graffiti Spray Can (" .. dye.desc .. ")") .. "\n" ..
             S("Left-click to spray, right-click to configure.") .. "\n\n" ..
             S("Size: @1", 1),
-        inventory_image = "ggraffiti_spray_can.png^(ggraffiti_spray_can_color.png^[multiply:" .. dye.color .. ")",
+        inventory_image = shared.get_colored_can_texmod(dye.color),
 
         range = shared.MAX_SPRAY_DISTANCE,
         on_use = spray_can_on_use,

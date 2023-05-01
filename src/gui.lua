@@ -30,34 +30,41 @@ function shared.meta_get_rgb_color(meta)
     return minetest.deserialize(meta:get_string("ggraffiti_rgb_color"))
 end
 
-local function update_item_description(item, meta)
+local function update_item_meta(item, meta)
     local spray_def = shared.get_raw_spray_def(item)
 
-    local desc
+    local size = shared.meta_get_size(meta)
     if spray_def.rgb then
         local color = shared.meta_get_rgb_color(meta)
-        local color_block = minetest.colorize(minetest.colorspec_to_colorstring(color), "█")
-        local size = shared.meta_get_size(meta)
-        desc = item:get_short_description() .. "\n" ..
+        local color_str = minetest.colorspec_to_colorstring(color)
+        local color_block = minetest.colorize(color_str, "█")
+
+        meta:set_string("description",
+            item:get_short_description() .. "\n" ..
             S("Left-click to spray, right-click to configure.") .. "\n\n" ..
             S("Color: ") .. color_block .. S(" @1, @2, @3", color.r, color.g, color.b) .. "\n" ..
             S("Size: @1", size)
+        )
+        -- 5.8.0-dev feature
+        meta:set_string("inventory_image", shared.get_colored_can_texmod(color_str))
     else
-        local size = shared.meta_get_size(meta)
-        desc = item:get_short_description() .. "\n" ..
+        meta:set_string("description",
+            item:get_short_description() .. "\n" ..
             S("Left-click to spray, right-click to configure.") .. "\n\n" ..
             S("Size: @1", size)
+        )
     end
-    meta:set_string("description", desc)
+    meta:set_string("count_meta", size == 1 and "" or tostring(size))
+    meta:set_string("count_alignment", size == 1 and "" or "13") -- 1 + 3 * 4
 end
 
 local function meta_set_size(item, meta, size)
     meta:set_string("ggraffiti_size", tostring(size))
-    update_item_description(item, meta)
+    update_item_meta(item, meta)
 end
 local function meta_set_rgb_color(item, meta, color)
     meta:set_string("ggraffiti_rgb_color", minetest.serialize(color))
-    update_item_description(item, meta)
+    update_item_meta(item, meta)
 end
 
 local gui_configure
