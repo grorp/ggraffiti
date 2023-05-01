@@ -269,12 +269,10 @@ minetest.register_globalstep(function(dtime)
         --     end
 
         --     local avg = 0
-        --     local div = 0
         --     for _, v in ipairs(deltas) do
         --         avg = avg + v
-        --         div = div + 1
         --     end
-        --     avg = avg / div
+        --     avg = avg / #deltas
         --     print(string.format("[ggraffiti] average spray step time: %.6f ms", avg))
         -- end
     end
