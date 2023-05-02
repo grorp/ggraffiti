@@ -92,11 +92,8 @@ function shared.spraycast(player, pos, dir, def)
 
     local node_pos = pthing.under
     local player_name = player:get_player_name()
-    -- TODO: Allow rect spreading to unprotected nodes even if the pointed node
-    -- is protected.
-    if is_protected_cached(node_pos, player_name) then
-        return
-    end
+    local is_protected = is_protected_cached(node_pos, player_name)
+    if is_protected and def.size == 1 then return end
 
     local raw_box = get_node_selectionboxes_cached(pthing.under)[pthing.box_id]
     if not raw_box then return end -- Modlib failed 😱
@@ -113,16 +110,21 @@ function shared.spraycast(player, pos, dir, def)
     local rot_box_size = rot_box:get_size()
     local bitmap_size = calc_bitmap_size(rot_box_size)
 
-    local canvas_pos = node_pos + box_center + vector.new(0, 0, rot_box_size.z * 0.501):rotate(canvas_rot)
+    local canvas
 
-    local canvas = find_canvas(canvas_pos)
-    if not canvas and not def.remover then
-        local canvas_size = { x = rot_box_size.x, y = rot_box_size.y }
-        canvas = create_canvas(
-            node_pos, canvas_pos, canvas_rot, canvas_size, bitmap_size)
-        if not canvas then return end -- This is actually an error.
+    if not is_protected then
+        local canvas_pos = node_pos + box_center + vector.new(0, 0, rot_box_size.z * 0.501):rotate(canvas_rot)
+        canvas = find_canvas(canvas_pos)
+
+        if not canvas and not def.remover then
+            local canvas_size = { x = rot_box_size.x, y = rot_box_size.y }
+            canvas = create_canvas(
+                node_pos, canvas_pos, canvas_rot, canvas_size, bitmap_size)
+            if not canvas then return end -- This is actually an error.
+        end
+
+        if not canvas and def.size == 1 then return end
     end
-    if not canvas and def.size == 1 then return end
 
     local root_pos = node_pos + box_center + vector.new(0, 0, rot_box_size.z * 0.5):rotate(canvas_rot)
     local pointed_pos = pthing.intersection_point
