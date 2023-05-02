@@ -2,6 +2,10 @@ local shared = ...
 local gui = flow.widgets
 local S = minetest.get_translator("ggraffiti")
 
+-- named as in the Minetest Modding Book
+local FORMSPEC_PADDING = 0.4
+local FORMSPEC_SPACING = 0.25
+
 -- In formspecs, I use server-side translations so that the layout of the
 -- formspecs can adapt to the length of the translated strings.
 local function ServerSDouble(player, string)
@@ -89,11 +93,12 @@ end
 
 gui_configure = flow.make_gui(function(player, ctx)
     return gui.VBox {
-        padding = 0.4,
-        spacing = 0.4,
+        padding = FORMSPEC_PADDING,
+        spacing = FORMSPEC_PADDING,
+
         gui.label { label = ServerSDouble(player, ctx.item_desc) },
         ctx.rgb_color and gui.HBox {
-            spacing = 0.4,
+            spacing = FORMSPEC_SPACING,
             gui.VBox {
                 spacing = 0,
                 expand = true,
@@ -122,7 +127,7 @@ gui_configure = flow.make_gui(function(player, ctx)
             },
         } or gui.Nil {},
         gui.HBox {
-            spacing = 0.4,
+            spacing = FORMSPEC_SPACING,
             gui.VBox {
                 spacing = 0,
                 expand = true,
@@ -225,52 +230,56 @@ gui_change_rgb_color = flow.make_gui(function(player, ctx)
     end
 
     return gui.VBox {
-        padding = 0.4,
-        spacing = 0.4,
+        padding = FORMSPEC_PADDING,
+        spacing = FORMSPEC_PADDING,
+
         gui.Label {
             label = ctx.initial_setup and
                 ServerS(player, "Set Color") or
                 ServerS(player, "Change Color"),
         },
-        gui.HBox {
-            spacing = 0.4,
-            gui.Field {
-                name = "field_r",
-                label = minetest.colorize("#f00", ServerS(player, "R (Red)")),
-                default = not ctx.initial_setup and tostring(ctx.rgb_color.r) or nil,
-                expand = true,
-                on_event = function(player, ctx)
-                    ctx.form.field_r = adjust_field_value(ctx.form.field_r)
-                    return true
-                end,
+        gui.VBox {
+            spacing = FORMSPEC_SPACING,
+            gui.HBox {
+                spacing = FORMSPEC_SPACING,
+                gui.Field {
+                    name = "field_r",
+                    label = minetest.colorize("#f00", ServerS(player, "R (Red)")),
+                    default = not ctx.initial_setup and tostring(ctx.rgb_color.r) or nil,
+                    expand = true,
+                    on_event = function(player, ctx)
+                        ctx.form.field_r = adjust_field_value(ctx.form.field_r)
+                        return true
+                    end,
+                },
+                gui.Field {
+                    name = "field_g",
+                    label = minetest.colorize("#0f0", ServerS(player, "G (Green)")),
+                    default = not ctx.initial_setup and tostring(ctx.rgb_color.g) or nil,
+                    expand = true,
+                    on_event = function(player, ctx)
+                        ctx.form.field_g = adjust_field_value(ctx.form.field_g)
+                        return true
+                    end,
+                },
+                gui.Field {
+                    name = "field_b",
+                    label = minetest.colorize("#00f", ServerS(player, "B (Blue)")),
+                    default = not ctx.initial_setup and tostring(ctx.rgb_color.b) or nil,
+                    expand = true,
+                    on_event = function(player, ctx)
+                        ctx.form.field_b = adjust_field_value(ctx.form.field_b)
+                        return true
+                    end,
+                },
             },
-            gui.Field {
-                name = "field_g",
-                label = minetest.colorize("#0f0", ServerS(player, "G (Green)")),
-                default = not ctx.initial_setup and tostring(ctx.rgb_color.g) or nil,
-                expand = true,
-                on_event = function(player, ctx)
-                    ctx.form.field_g = adjust_field_value(ctx.form.field_g)
-                    return true
-                end,
-            },
-            gui.Field {
-                name = "field_b",
-                label = minetest.colorize("#00f", ServerS(player, "B (Blue)")),
-                default = not ctx.initial_setup and tostring(ctx.rgb_color.b) or nil,
-                expand = true,
-                on_event = function(player, ctx)
-                    ctx.form.field_b = adjust_field_value(ctx.form.field_b)
-                    return true
-                end,
-            },
+            gui.Label { label = ServerS(player, "Values must be integers in the range [0..255].") },
         },
-        gui.Label { label = ServerS(player, "Values must be integers in the range [0..255].") },
         gui.VBox {
             spacing = 0,
             gui.Label { label = ServerS(player, "Preview") },
             gui.HBox {
-                spacing = 0.4,
+                spacing = FORMSPEC_SPACING,
                 png_color and gui.Image {
                     w = 0.8,
                     h = 0.8,
@@ -287,7 +296,7 @@ gui_change_rgb_color = flow.make_gui(function(player, ctx)
             },
         },
         gui.HBox {
-            spacing = 0.4,
+            spacing = FORMSPEC_SPACING,
             ctx.initial_setup and gui.Nil {} or gui.Button {
                 label = ServerS(player, "Cancel"),
                 expand = true,
@@ -337,8 +346,9 @@ gui_change_size = flow.make_gui(function(player, ctx)
     end
 
     return gui.VBox {
-        padding = 0.4,
-        spacing = 0.4,
+        padding = FORMSPEC_PADDING,
+        spacing = FORMSPEC_PADDING,
+
         gui.Label { label = ServerS(player, "Change Size") .. " " .. get_gui_experimental_str(player) },
         gui.Dropdown {
             name = "dropdown_size",
@@ -347,7 +357,7 @@ gui_change_size = flow.make_gui(function(player, ctx)
             index_event = true,
         },
         gui.HBox {
-            spacing = 0.4,
+            spacing = FORMSPEC_SPACING,
             gui.Button {
                 label = ServerS(player, "Cancel"),
                 expand = true,
