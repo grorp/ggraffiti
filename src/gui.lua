@@ -38,6 +38,8 @@ local function update_item_meta(item, meta)
     local spray_def = shared.get_raw_spray_def(item)
 
     local size = shared.meta_get_size(meta)
+    meta:set_string("count_meta",      size == 1 and "" or tostring(size))
+    meta:set_string("count_alignment", size == 1 and "" or "13") -- 1 + 3 * 4
     if spray_def.rgb then
         local color = shared.meta_get_rgb_color(meta)
         local color_str = minetest.colorspec_to_colorstring(color)
@@ -58,8 +60,6 @@ local function update_item_meta(item, meta)
             S("Size: @1", size)
         )
     end
-    meta:set_string("count_meta", size == 1 and "" or tostring(size))
-    meta:set_string("count_alignment", size == 1 and "" or "13") -- 1 + 3 * 4
 end
 
 local function meta_set_size(item, meta, size)
