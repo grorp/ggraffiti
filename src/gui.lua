@@ -2,6 +2,7 @@ local shared = ...
 local gui = flow.widgets
 local S = minetest.get_translator("ggraffiti")
 
+local FORMSPEC_MIN_WIDTH = 6
 -- named as in the Minetest Modding Book
 local FORMSPEC_PADDING = 0.4
 local FORMSPEC_SPACING = 0.25
@@ -80,12 +81,6 @@ local function make_color_texture(color)
     return "[png:" .. minetest.encode_base64(png)
 end
 
-local function get_gui_experimental_str(player)
-    -- MT orange
-    -- https://github.com/minetest/minetest/blob/5.6.1/builtin/mainmenu/init.lua#L23
-    return minetest.colorize("#ff8800", ServerS(player, "[Experimental]"))
-end
-
 local function get_gui_size_str(player, size)
     return size == 1 and ServerS(player, "1 pixel") or
         ServerS(player, "@1 pixels", size)
@@ -93,6 +88,7 @@ end
 
 gui_configure = flow.make_gui(function(player, ctx)
     return gui.VBox {
+        min_w = FORMSPEC_MIN_WIDTH,
         padding = FORMSPEC_PADDING,
         spacing = FORMSPEC_PADDING,
 
@@ -132,9 +128,7 @@ gui_configure = flow.make_gui(function(player, ctx)
                 spacing = 0,
                 expand = true,
                 align_h = "left",
-                gui.Label {
-                    label = ServerS(player, "Size") .. " " .. get_gui_experimental_str(player),
-                },
+                gui.Label { label = ServerS(player, "Size") },
                 gui.Label { label = get_gui_size_str(player, ctx.size) },
             },
             gui.Button {
@@ -230,6 +224,7 @@ gui_change_rgb_color = flow.make_gui(function(player, ctx)
     end
 
     return gui.VBox {
+        min_w = FORMSPEC_MIN_WIDTH,
         padding = FORMSPEC_PADDING,
         spacing = FORMSPEC_PADDING,
 
@@ -273,7 +268,7 @@ gui_change_rgb_color = flow.make_gui(function(player, ctx)
                     end,
                 },
             },
-            gui.Label { label = ServerS(player, "Values must be integers in the range [0..255].") },
+            gui.Label { label = ServerS(player, "Values must be integers between 0 and 255.") },
         },
         gui.VBox {
             spacing = 0,
@@ -346,10 +341,11 @@ gui_change_size = flow.make_gui(function(player, ctx)
     end
 
     return gui.VBox {
+        min_w = FORMSPEC_MIN_WIDTH,
         padding = FORMSPEC_PADDING,
         spacing = FORMSPEC_PADDING,
 
-        gui.Label { label = ServerS(player, "Change Size") .. " " .. get_gui_experimental_str(player) },
+        gui.Label { label = ServerS(player, "Change Size") },
         gui.Dropdown {
             name = "dropdown_size",
             items = available_size_strs,
