@@ -73,7 +73,7 @@ local function vec_to_canvas_space(vec, canvas_rot)
     return vector.new(-vec.x, -vec.y, vec.z):rotate(canvas_rot)
 end
 
-local draw_rect, spread_rect, spread_rect_to_node, spread_rect_to_box
+local draw_rect, spread_rect_to_node, spread_rect_to_box
 
 function shared.spraycast(player, pos, dir, def)
     local ray = minetest.raycast(pos, pos + dir * shared.MAX_SPRAY_DISTANCE, true, false)
@@ -164,22 +164,52 @@ function shared.spraycast(player, pos, dir, def)
             })
         end
 
-        if rect_x < 0 or rect_x + def.size - 1 > bitmap_size.x - 1 or
-                rect_y < 0 or rect_y + def.size - 1 > bitmap_size.y - 1 then
-            spread_rect({
+        local exceeds_left = rect_x < 0
+        local exceeds_top = rect_y < 0
+        local exceeds_right = rect_x + def.size - 1 > bitmap_size.x - 1
+        local exceeds_bottom = rect_y + def.size - 1 > bitmap_size.y - 1
+
+        if exceeds_left or exceeds_top or exceeds_right or exceeds_bottom then
+            local spread_props = {
                 player = player,
                 self_node_pos = node_pos,
                 self_root_pos = root_pos,
+                self_root_pos_canvas = vec_to_canvas_space(root_pos, canvas_rot),
                 self_rot = canvas_rot,
                 self_rot_box_size = rot_box_size,
-                skip_box_index = pthing.box_id,
 
                 x = rect_x,
                 y = rect_y,
                 size = def.size,
                 color = color,
                 remover = def.remover,
-            })
+            }
+            spread_rect_to_node(spread_props, node_pos, pthing.box_id)
+            local function spread_offset(x, y)
+                -- partially duplicated from vec_to_canvas_space
+                spread_rect_to_node(spread_props, node_pos + vector.new(-x, -y, 0):rotate(canvas_rot))
+            end
+
+            if exceeds_left then
+                spread_offset(-1, 0)
+            elseif exceeds_right then
+                spread_offset(1, 0)
+            end
+            if exceeds_top then
+                spread_offset(0, -1)
+            elseif exceeds_bottom then
+                spread_offset(0, 1)
+            end
+
+            if exceeds_left and exceeds_top then
+                spread_offset(-1, -1)
+            elseif exceeds_left and exceeds_bottom then
+                spread_offset(-1, 1)
+            elseif exceeds_right and exceeds_top then
+                spread_offset(1, -1)
+            elseif exceeds_right and exceeds_bottom then
+                spread_offset(1, 1)
+            end
         end
     end
 
@@ -213,46 +243,21 @@ draw_rect = function(canvas, props)
     end
 end
 
-local spread_node_offsets = {
-    vector.new(-1, -1, 0),
-    vector.new(-1, 0, 0),
-    vector.new(-1, 1, 0),
-    vector.new(0, -1, 0),
-    vector.new(0, 0, 0),
-    vector.new(0, 1, 0),
-    vector.new(1, -1, 0),
-    vector.new(1, 0, 0),
-    vector.new(1, 1, 0),
-}
-
-spread_rect = function(props)
-    local self_node_pos = props.self_node_pos
-    local self_rot = props.self_rot
-    local self_root_pos_canvas = vec_to_canvas_space(props.self_root_pos, self_rot)
-
-    for _, offset in ipairs(spread_node_offsets) do
-        local other_node_pos = self_node_pos + offset:rotate(self_rot)
-        spread_rect_to_node(props, self_root_pos_canvas, other_node_pos)
-    end
-end
-
-spread_rect_to_node = function(props, self_root_pos_canvas, other_node_pos)
+spread_rect_to_node = function(props, other_node_pos, skip_box_index)
     local player_name = props.player:get_player_name()
     if is_protected_cached(other_node_pos, player_name) then
         return
     end
-
-    local is_same_node = other_node_pos == props.self_node_pos
     local raw_boxes = get_node_selectionboxes_cached(other_node_pos)
 
     for index, raw_box in ipairs(raw_boxes) do
-        if not is_same_node or index ~= props.skip_box_index then
-            spread_rect_to_box(props, self_root_pos_canvas, other_node_pos, raw_box)
+        if index ~= skip_box_index then
+            spread_rect_to_box(props, other_node_pos, raw_box)
         end
     end
 end
 
-spread_rect_to_box = function(props, self_root_pos_canvas, other_node_pos, raw_box)
+spread_rect_to_box = function(props, other_node_pos, raw_box)
     local box = shared.aabb.from(raw_box)
     box:repair()
     local box_center = box:get_center()
@@ -265,6 +270,7 @@ spread_rect_to_box = function(props, self_root_pos_canvas, other_node_pos, raw_b
     rot_box:repair()
     local rot_box_size = rot_box:get_size()
 
+    local self_root_pos_canvas = props.self_root_pos_canvas
     local other_root_pos = other_node_pos + box_center + vector.new(0, 0, rot_box_size.z * 0.5):rotate(self_rot)
     local other_root_pos_canvas = vec_to_canvas_space(other_root_pos, self_rot)
     if not nearly_equal(self_root_pos_canvas.z, other_root_pos_canvas.z) then
