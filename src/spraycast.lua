@@ -33,7 +33,7 @@ local function get_node_selectionboxes_cached(pos)
 end
 
 local function vector_length_sq(v)
-	return v.x * v.x + v.y * v.y + v.z * v.z
+    return v.x * v.x + v.y * v.y + v.z * v.z
 end
 
 local function nearly_equal(a, b)
