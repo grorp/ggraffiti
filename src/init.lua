@@ -37,20 +37,6 @@ if not flow.widgets or not rawget(flow.widgets, "Nil") then
     dependency_version_error("Flow")
 end
 
--- For the largest available spray size (5×5=25 pixels), this results in 12 seconds.
-shared.SPRAY_DURATION = 5 * 60
--- Clients send the position of their player every 0.1 seconds.
--- https://github.com/minetest/minetest/blob/5.6.1/src/client/client.h#L563
--- https://github.com/minetest/minetest/blob/5.6.1/src/client/client.cpp#L528
-shared.SPRAY_STEP_INTERVAL = 0.1
-shared.NUM_SPRAY_STEPS = 5
-
-shared.MAX_SPRAY_DISTANCE = 4
-shared.DESIRED_PIXEL_SIZE = 1/16
-shared.TRANSPARENT = "#00000000"
-
-shared.EPSILON = 0.0001
-
 if shared.game == "mtg" then
     -- Creative inventory concept:
     -- All spray cans: "Tools"
@@ -121,8 +107,6 @@ else
 end
 
 local basepath = minetest.get_modpath("ggraffiti") .. "/src"
-assert(loadfile(basepath .. "/aabb.lua"))(shared)
-assert(loadfile(basepath .. "/canvas.lua"))(shared)
-assert(loadfile(basepath .. "/spraycast.lua"))(shared)
+assert(loadfile(basepath .. "/api/init.lua"))(shared)
 assert(loadfile(basepath .. "/gui.lua"))(shared)
 assert(loadfile(basepath .. "/items.lua"))(shared)

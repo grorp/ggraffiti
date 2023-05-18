@@ -115,7 +115,7 @@ end
 local spread_rect_to_node, spread_rect_to_box
 
 function shared.spraycast(player, pos, dir, def)
-    local ray = minetest.raycast(pos, pos + dir * shared.MAX_SPRAY_DISTANCE, true, false)
+    local ray = minetest.raycast(pos, pos + dir * def.max_distance, true, false)
     local pthing
     for i_pthing in ray do
         if i_pthing.ref ~= player then
@@ -293,7 +293,8 @@ spread_rect_to_box = function(props, other_node_pos, raw_box)
         return
     end
 
-    local other_pos = other_node_pos + box_center + vector_prerot(vector.new(0, 0, rot_box_size.z * 0.501), self_prerot)
+    local other_pos = other_node_pos + box_center +
+        vector_prerot(vector.new(0, 0, rot_box_size.z * 0.501), self_prerot)
 
     local canvas = find_canvas(other_pos)
     if not canvas and not props.remover then

@@ -18,9 +18,8 @@ local function ServerS(player, string, ...)
     return ServerSDouble(player, S(string, ...))
 end
 
-function shared.get_raw_spray_def(item)
-    local def = item:get_definition()
-    return def and def._ggraffiti_spray_can
+local function is_rgb_spray_can(item)
+    return item:get_name() == "ggraffiti:spray_can_rgb"
 end
 
 local available_sizes = {}
@@ -36,12 +35,10 @@ function shared.meta_get_rgb_color(meta)
 end
 
 local function update_item_meta(item, meta)
-    local spray_def = shared.get_raw_spray_def(item)
-
     local size = shared.meta_get_size(meta)
     meta:set_string("count_meta",      size == 1 and "" or tostring(size))
     meta:set_string("count_alignment", size == 1 and "" or "13") -- 1 + 3 * 4
-    if spray_def.rgb then
+    if is_rgb_spray_can(item) then
         local color = shared.meta_get_rgb_color(meta)
         local color_str = minetest.colorspec_to_colorstring(color)
         local color_block = minetest.colorize(color_str, "█")
@@ -167,7 +164,9 @@ local function is_correct_item(ctx, item)
     end
 
     local meta = item:get_meta()
-    local rgb_color = shared.meta_get_rgb_color(meta)
+
+    local is_rgb = is_rgb_spray_can(item)
+    local rgb_color = is_rgb and shared.meta_get_rgb_color(meta) or nil
     if not (ctx.rgb_color == nil and rgb_color == nil) and
             not (ctx.rgb_color ~= nil and rgb_color ~= nil and
             ctx.rgb_color.r == rgb_color.r and
@@ -378,16 +377,18 @@ function shared.gui_show_rgb_initial_setup(player, item, meta)
 end
 
 function shared.gui_show_configure(player, item, meta)
-    local spray_def = shared.get_raw_spray_def(item)
+    local is_rgb = is_rgb_spray_can(item)
     local rgb_color = shared.meta_get_rgb_color(meta)
-    if spray_def.rgb and not rgb_color then
+
+    if is_rgb and not rgb_color then
         shared.gui_show_rgb_initial_setup(player, item, meta)
         return
     end
+
     gui_configure:show(player, {
         item_name = item:get_name(),
         item_desc = item:get_short_description(),
-        rgb_color = rgb_color,
+        rgb_color = is_rgb and rgb_color or nil,
         size = shared.meta_get_size(meta),
     })
 end
