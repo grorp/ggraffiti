@@ -153,7 +153,8 @@ function shared.spraycast(player, pos, dir, def)
     local canvas
 
     if not is_protected then
-        local canvas_pos = node_pos + box_center + vector_prerot(vector.new(0, 0, rot_box_size.z * 0.501), canvas_prerot)
+        local canvas_pos = node_pos + box_center +
+            vector_prerot(vector.new(0, 0, rot_box_size.z * 0.501), canvas_prerot)
         canvas = find_canvas(canvas_pos)
 
         if not canvas and not def.remover then
@@ -166,7 +167,8 @@ function shared.spraycast(player, pos, dir, def)
         if not canvas and def.size == 1 then return end
     end
 
-    local root_pos = node_pos + box_center + vector_prerot(vector.new(0, 0, rot_box_size.z * 0.5), canvas_prerot)
+    local root_pos = node_pos + box_center +
+        vector_prerot(vector.new(0, 0, rot_box_size.z * 0.5), canvas_prerot)
     local pointed_pos = pthing.intersection_point
 
     -- 2D (Z is always zero)
@@ -267,7 +269,8 @@ spread_rect_to_box = function(props, other_node_pos, raw_box)
     local rot_box_size = rot_box:get_size()
 
     local self_root_pos_canvas = props.self_root_pos_canvas
-    local other_root_pos = other_node_pos + box_center + vector_prerot(vector.new(0, 0, rot_box_size.z * 0.5), self_prerot)
+    local other_root_pos = other_node_pos + box_center +
+        vector_prerot(vector.new(0, 0, rot_box_size.z * 0.5), self_prerot)
     local other_root_pos_canvas = vec_to_canvas_space(other_root_pos, self_prerot)
     if not nearly_equal(self_root_pos_canvas.z, other_root_pos_canvas.z) then
         return
