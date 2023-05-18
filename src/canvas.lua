@@ -109,6 +109,47 @@ function CanvasEntity:update_immediately()
     })
 end
 
+function CanvasEntity:draw_pixel(x, y, color, remover)
+    local index = y * self.bitmap_size.x + x + 1
+
+    if self.bitmap[index] ~= color then
+        self.bitmap[index] = color
+
+        if remover and self:is_empty() then
+            self.object:remove()
+        else
+            self:update_later()
+        end
+    end
+end
+
+local function clamp(val, min, max)
+    return math.min(math.max(val, min), max)
+end
+
+function CanvasEntity:draw_rect(x, y, size, color, remover)
+    local max_x = self.bitmap_size.x - 1
+    local max_y = self.bitmap_size.y - 1
+    local x1, y1 =
+        clamp(x, 0, max_x),
+        clamp(y, 0, max_y)
+    local x2, y2 =
+        clamp(x + size - 1, 0, max_x),
+        clamp(y + size - 1, 0, max_y)
+
+    for yy = y1, y2 do
+        for xx = x1, x2 do
+            self.bitmap[yy * self.bitmap_size.x + xx + 1] = color
+        end
+    end
+
+    if remover and self:is_empty() then
+        self.object:remove()
+    else
+        self:update_later()
+    end
+end
+
 function CanvasEntity:is_empty()
     for _, c in ipairs(self.bitmap) do
         if c ~= shared.TRANSPARENT then

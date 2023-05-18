@@ -73,7 +73,7 @@ local function vec_to_canvas_space(vec, canvas_rot)
     return vector.new(-vec.x, -vec.y, vec.z):rotate(canvas_rot)
 end
 
-local draw_rect, spread_rect_to_node, spread_rect_to_box
+local spread_rect_to_node, spread_rect_to_box
 
 function shared.spraycast(player, pos, dir, def)
     local ray = minetest.raycast(pos, pos + dir * shared.MAX_SPRAY_DISTANCE, true, false)
@@ -139,29 +139,13 @@ function shared.spraycast(player, pos, dir, def)
     local color = def.remover and shared.TRANSPARENT or def.color
 
     if def.size == 1 then
-        local index = math.floor(pos_on_bitmap_y) * bitmap_size.x + math.floor(pos_on_bitmap_x) + 1
-
-        if canvas.bitmap[index] ~= color then
-            canvas.bitmap[index] = color
-
-            if def.remover and canvas:is_empty() then
-                canvas.object:remove()
-            else
-                canvas:update_later()
-            end
-        end
+        canvas:draw_pixel(math.floor(pos_on_bitmap_x), math.floor(pos_on_bitmap_y), color, def.remover)
     else
         local rect_x = math.round(pos_on_bitmap_x - def.size / 2)
         local rect_y = math.round(pos_on_bitmap_y - def.size / 2)
 
         if canvas then
-            draw_rect(canvas, {
-                x = rect_x,
-                y = rect_y,
-                size = def.size,
-                color = color,
-                remover = def.remover,
-            })
+            canvas:draw_rect(rect_x, rect_y, def.size, color, def.remover)
         end
 
         local exceeds_left = rect_x < 0
@@ -171,9 +155,8 @@ function shared.spraycast(player, pos, dir, def)
 
         if exceeds_left or exceeds_top or exceeds_right or exceeds_bottom then
             local spread_props = {
-                player = player,
+                player_name = player_name,
                 self_node_pos = node_pos,
-                self_root_pos = root_pos,
                 self_root_pos_canvas = vec_to_canvas_space(root_pos, canvas_rot),
                 self_rot = canvas_rot,
                 self_rot_box_size = rot_box_size,
@@ -216,42 +199,14 @@ function shared.spraycast(player, pos, dir, def)
     -- shared.profiler_someone_spraying = true
 end
 
-local function clamp(val, min, max)
-    return math.min(math.max(val, min), max)
-end
-
-draw_rect = function(canvas, props)
-    local max_x = canvas.bitmap_size.x - 1
-    local max_y = canvas.bitmap_size.y - 1
-    local x1, y1 =
-        clamp(props.x, 0, max_x),
-        clamp(props.y, 0, max_y)
-    local x2, y2 =
-        clamp(props.x + props.size - 1, 0, max_x),
-        clamp(props.y + props.size - 1, 0, max_y)
-
-    for xx = x1, x2 do
-        for yy = y1, y2 do
-            canvas.bitmap[yy * canvas.bitmap_size.x + xx + 1] = props.color
-        end
-    end
-
-    if props.remover and canvas:is_empty() then
-        canvas.object:remove()
-    else
-        canvas:update_later()
-    end
-end
-
-spread_rect_to_node = function(props, other_node_pos, skip_box_index)
-    local player_name = props.player:get_player_name()
-    if is_protected_cached(other_node_pos, player_name) then
+spread_rect_to_node = function(props, other_node_pos, skip_box_id)
+    if is_protected_cached(other_node_pos, props.player_name) then
         return
     end
     local raw_boxes = get_node_selectionboxes_cached(other_node_pos)
 
     for index, raw_box in ipairs(raw_boxes) do
-        if index ~= skip_box_index then
+        if index ~= skip_box_id then
             spread_rect_to_box(props, other_node_pos, raw_box)
         end
     end
@@ -300,18 +255,11 @@ spread_rect_to_box = function(props, other_node_pos, raw_box)
     if not canvas and not props.remover then
         local other_size = { x = rot_box_size.x, y = rot_box_size.y }
         canvas = create_canvas(
-            other_node_pos, other_pos, props.self_rot, other_size, bitmap_size)
+            other_node_pos, other_pos, self_rot, other_size, bitmap_size)
     end
     if not canvas then return end
 
-    local lessprops_new = {
-        x = new_x,
-        y = new_y,
-        size = props.size,
-        color = props.color,
-        remover = props.remover,
-    }
-    draw_rect(canvas, lessprops_new)
+    canvas:draw_rect(new_x, new_y, props.size, props.color, props.remover)
 end
 
 function shared.after_spraycasts()
