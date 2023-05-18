@@ -93,7 +93,7 @@ gui_configure = flow.make_gui(function(player, ctx)
         spacing = FORMSPEC_PADDING,
 
         gui.label { label = ServerSDouble(player, ctx.item_desc) },
-        ctx.rgb_color and gui.HBox {
+        ctx.is_rgb and gui.HBox {
             spacing = FORMSPEC_SPACING,
             gui.VBox {
                 spacing = 0,
@@ -116,6 +116,7 @@ gui_configure = flow.make_gui(function(player, ctx)
                     gui_change_rgb_color:show(player, {
                         item_name = ctx.item_name,
                         item_desc = ctx.item_desc,
+                        is_rgb = ctx.is_rgb,
                         rgb_color = ctx.rgb_color,
                         size = ctx.size,
                     })
@@ -137,6 +138,7 @@ gui_configure = flow.make_gui(function(player, ctx)
                     gui_change_size:show(player, {
                         item_name = ctx.item_name,
                         item_desc = ctx.item_desc,
+                        is_rgb = ctx.is_rgb,
                         rgb_color = ctx.rgb_color,
                         size = ctx.size,
                     })
@@ -156,6 +158,7 @@ local function cancel_button_on_event(player, ctx)
     gui_configure:show(player, {
         item_name = ctx.item_name,
         item_desc = ctx.item_desc,
+        is_rgb = ctx.is_rgb,
         rgb_color = ctx.rgb_color,
         size = ctx.size,
     })
@@ -205,6 +208,7 @@ local function change_rgb_color_save_button_on_event(player, ctx)
         gui_configure:show(player, {
             item_name = ctx.item_name,
             item_desc = ctx.item_desc,
+            is_rgb = ctx.is_rgb,
             rgb_color = rgb_color,
             size = ctx.size,
         })
@@ -327,6 +331,7 @@ local function change_size_save_button_on_event(player, ctx)
             gui_configure:show(player, {
                 item_name = ctx.item_name,
                 item_desc = ctx.item_desc,
+                is_rgb = ctx.is_rgb,
                 rgb_color = ctx.rgb_color,
                 size = size,
             })
@@ -373,6 +378,7 @@ function shared.gui_show_rgb_initial_setup(player, item, meta)
         initial_setup = true,
         item_name = item:get_name(),
         item_desc = item:get_short_description(),
+        is_rgb = true,
         size = shared.meta_get_size(meta),
     })
 end
@@ -387,6 +393,7 @@ function shared.gui_show_configure(player, item, meta)
     gui_configure:show(player, {
         item_name = item:get_name(),
         item_desc = item:get_short_description(),
+        is_rgb = spray_def.rgb,
         rgb_color = rgb_color,
         size = shared.meta_get_size(meta),
     })

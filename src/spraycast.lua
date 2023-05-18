@@ -293,7 +293,8 @@ spread_rect_to_box = function(props, other_node_pos, raw_box)
         return
     end
 
-    local other_pos = other_node_pos + box_center + vector_prerot(vector.new(0, 0, rot_box_size.z * 0.501), self_prerot)
+    local other_pos = other_node_pos + box_center +
+            vector_prerot(vector.new(0, 0, rot_box_size.z * 0.501), self_prerot)
 
     local canvas = find_canvas(other_pos)
     if not canvas and not props.remover then

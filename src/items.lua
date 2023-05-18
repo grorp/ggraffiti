@@ -56,7 +56,7 @@ local function spray_can_on_use(item, player)
     local player_name = player:get_player_name()
 
     local spray_def = get_processed_spray_def(item, player)
-    assert(spray_def)
+    if not spray_def then return end
 
     local pos = get_eye_pos(player)
     local dir = player:get_look_dir()
