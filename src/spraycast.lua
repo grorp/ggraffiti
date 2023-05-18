@@ -45,38 +45,38 @@ end
 
 local function vector_prerot_pre(rot)
     local sinpitch = math.sin(-rot.x)
-	local sinyaw   = math.sin(-rot.y)
-	local sinroll  = math.sin(-rot.z)
-	local cospitch = math.cos(rot.x)
-	local cosyaw   = math.cos(rot.y)
-	local cosroll  = math.cos(rot.z)
-	-- Rotation matrix that applies yaw, pitch and roll
-	return {
-		{
-			sinyaw * sinpitch * sinroll + cosyaw * cosroll,
-			sinyaw * sinpitch * cosroll - cosyaw * sinroll,
-			sinyaw * cospitch,
-		},
-		{
-			cospitch * sinroll,
-			cospitch * cosroll,
-			-sinpitch,
-		},
-		{
-			cosyaw * sinpitch * sinroll - sinyaw * cosroll,
-			cosyaw * sinpitch * cosroll + sinyaw * sinroll,
-			cosyaw * cospitch,
-		},
-	}
+    local sinyaw   = math.sin(-rot.y)
+    local sinroll  = math.sin(-rot.z)
+    local cospitch = math.cos(rot.x)
+    local cosyaw   = math.cos(rot.y)
+    local cosroll  = math.cos(rot.z)
+    -- Rotation matrix that applies yaw, pitch and roll
+    return {
+        {
+            sinyaw * sinpitch * sinroll + cosyaw * cosroll,
+            sinyaw * sinpitch * cosroll - cosyaw * sinroll,
+            sinyaw * cospitch,
+        },
+        {
+            cospitch * sinroll,
+            cospitch * cosroll,
+            -sinpitch,
+        },
+        {
+            cosyaw * sinpitch * sinroll - sinyaw * cosroll,
+            cosyaw * sinpitch * cosroll + sinyaw * sinroll,
+            cosyaw * cospitch,
+        },
+    }
 end
 
 local function vector_prerot(v, matrix)
     -- Compute matrix multiplication: `matrix` * `v`
-	return vector.new(
-		matrix[1][1] * v.x + matrix[1][2] * v.y + matrix[1][3] * v.z,
-		matrix[2][1] * v.x + matrix[2][2] * v.y + matrix[2][3] * v.z,
-		matrix[3][1] * v.x + matrix[3][2] * v.y + matrix[3][3] * v.z
-	)
+    return vector.new(
+        matrix[1][1] * v.x + matrix[1][2] * v.y + matrix[1][3] * v.z,
+        matrix[2][1] * v.x + matrix[2][2] * v.y + matrix[2][3] * v.z,
+        matrix[3][1] * v.x + matrix[3][2] * v.y + matrix[3][3] * v.z
+    )
 end
 
 local function calc_bitmap_size(canvas_size)
