@@ -32,12 +32,51 @@ local function get_node_selectionboxes_cached(pos)
     return new_result
 end
 
+local function nearly_equal(a, b)
+    return math.abs(a - b) < shared.EPSILON
+end
+
 local function vector_length_sq(v)
     return v.x * v.x + v.y * v.y + v.z * v.z
 end
 
-local function nearly_equal(a, b)
-    return math.abs(a - b) < shared.EPSILON
+-- `vector_prerot_pre` and `vector_prerot` are a split version of `vector.rotate`.
+-- https://github.com/minetest/minetest/blob/15fb4cab15c8d57028a2f616e1b443e8dc02e4f9/builtin/common/vector.lua#L309-L340
+
+local function vector_prerot_pre(rot)
+    local sinpitch = math.sin(-rot.x)
+	local sinyaw   = math.sin(-rot.y)
+	local sinroll  = math.sin(-rot.z)
+	local cospitch = math.cos(rot.x)
+	local cosyaw   = math.cos(rot.y)
+	local cosroll  = math.cos(rot.z)
+	-- Rotation matrix that applies yaw, pitch and roll
+	return {
+		{
+			sinyaw * sinpitch * sinroll + cosyaw * cosroll,
+			sinyaw * sinpitch * cosroll - cosyaw * sinroll,
+			sinyaw * cospitch,
+		},
+		{
+			cospitch * sinroll,
+			cospitch * cosroll,
+			-sinpitch,
+		},
+		{
+			cosyaw * sinpitch * sinroll - sinyaw * cosroll,
+			cosyaw * sinpitch * cosroll + sinyaw * sinroll,
+			cosyaw * cospitch,
+		},
+	}
+end
+
+local function vector_prerot(v, matrix)
+    -- Compute matrix multiplication: `matrix` * `v`
+	return vector.new(
+		matrix[1][1] * v.x + matrix[1][2] * v.y + matrix[1][3] * v.z,
+		matrix[2][1] * v.x + matrix[2][2] * v.y + matrix[2][3] * v.z,
+		matrix[3][1] * v.x + matrix[3][2] * v.y + matrix[3][3] * v.z
+	)
 end
 
 local function calc_bitmap_size(canvas_size)
@@ -69,8 +108,8 @@ local function create_canvas(node_pos, pos, rot, size, bitmap_size)
     return canvas
 end
 
-local function vec_to_canvas_space(vec, canvas_rot)
-    return vector.new(-vec.x, -vec.y, vec.z):rotate(canvas_rot)
+local function vec_to_canvas_space(vec, canvas_prerot)
+    return vector_prerot(vector.new(-vec.x, -vec.y, vec.z), canvas_prerot)
 end
 
 local spread_rect_to_node, spread_rect_to_box
@@ -102,9 +141,10 @@ function shared.spraycast(player, pos, dir, def)
     local box_center = box:get_center()
 
     local canvas_rot = vector.dir_to_rotation(pthing.intersection_normal)
+    local canvas_prerot = vector_prerot_pre(canvas_rot)
     local rot_box = shared.aabb.new(
-        box.pos_min:rotate(canvas_rot),
-        box.pos_max:rotate(canvas_rot)
+        vector_prerot(box.pos_min, canvas_prerot),
+        vector_prerot(box.pos_max, canvas_prerot)
     )
     rot_box:repair()
     local rot_box_size = rot_box:get_size()
@@ -113,7 +153,7 @@ function shared.spraycast(player, pos, dir, def)
     local canvas
 
     if not is_protected then
-        local canvas_pos = node_pos + box_center + vector.new(0, 0, rot_box_size.z * 0.501):rotate(canvas_rot)
+        local canvas_pos = node_pos + box_center + vector_prerot(vector.new(0, 0, rot_box_size.z * 0.501), canvas_prerot)
         canvas = find_canvas(canvas_pos)
 
         if not canvas and not def.remover then
@@ -126,12 +166,12 @@ function shared.spraycast(player, pos, dir, def)
         if not canvas and def.size == 1 then return end
     end
 
-    local root_pos = node_pos + box_center + vector.new(0, 0, rot_box_size.z * 0.5):rotate(canvas_rot)
+    local root_pos = node_pos + box_center + vector_prerot(vector.new(0, 0, rot_box_size.z * 0.5), canvas_prerot)
     local pointed_pos = pthing.intersection_point
 
     -- 2D (Z is always zero)
     local pos_on_canvas = vector.new(rot_box_size.x / 2, rot_box_size.y / 2, 0) +
-        vec_to_canvas_space(pointed_pos - root_pos, canvas_rot)
+        vec_to_canvas_space(pointed_pos - root_pos, canvas_prerot)
 
     local pos_on_bitmap_x = pos_on_canvas.x / rot_box_size.x * bitmap_size.x
     local pos_on_bitmap_y = pos_on_canvas.y / rot_box_size.y * bitmap_size.y
@@ -157,8 +197,9 @@ function shared.spraycast(player, pos, dir, def)
             local spread_props = {
                 player_name = player_name,
                 self_node_pos = node_pos,
-                self_root_pos_canvas = vec_to_canvas_space(root_pos, canvas_rot),
+                self_root_pos_canvas = vec_to_canvas_space(root_pos, canvas_prerot),
                 self_rot = canvas_rot,
+                self_prerot = canvas_prerot,
                 self_rot_box_size = rot_box_size,
 
                 x = rect_x,
@@ -170,7 +211,7 @@ function shared.spraycast(player, pos, dir, def)
             spread_rect_to_node(spread_props, node_pos, pthing.box_id)
             local function spread_offset(x, y)
                 -- partially duplicated from vec_to_canvas_space
-                spread_rect_to_node(spread_props, node_pos + vector.new(-x, -y, 0):rotate(canvas_rot))
+                spread_rect_to_node(spread_props, node_pos + vector_prerot(vector.new(-x, -y, 0), canvas_prerot))
             end
 
             if exceeds_left then
@@ -217,17 +258,17 @@ spread_rect_to_box = function(props, other_node_pos, raw_box)
     box:repair()
     local box_center = box:get_center()
 
-    local self_rot = props.self_rot
+    local self_prerot = props.self_prerot
     local rot_box = shared.aabb.new(
-        box.pos_min:rotate(self_rot),
-        box.pos_max:rotate(self_rot)
+        vector_prerot(box.pos_min, self_prerot),
+        vector_prerot(box.pos_max, self_prerot)
     )
     rot_box:repair()
     local rot_box_size = rot_box:get_size()
 
     local self_root_pos_canvas = props.self_root_pos_canvas
-    local other_root_pos = other_node_pos + box_center + vector.new(0, 0, rot_box_size.z * 0.5):rotate(self_rot)
-    local other_root_pos_canvas = vec_to_canvas_space(other_root_pos, self_rot)
+    local other_root_pos = other_node_pos + box_center + vector_prerot(vector.new(0, 0, rot_box_size.z * 0.5), self_prerot)
+    local other_root_pos_canvas = vec_to_canvas_space(other_root_pos, self_prerot)
     if not nearly_equal(self_root_pos_canvas.z, other_root_pos_canvas.z) then
         return
     end
@@ -249,13 +290,13 @@ spread_rect_to_box = function(props, other_node_pos, raw_box)
         return
     end
 
-    local other_pos = other_node_pos + box_center + vector.new(0, 0, rot_box_size.z * 0.501):rotate(self_rot)
+    local other_pos = other_node_pos + box_center + vector_prerot(vector.new(0, 0, rot_box_size.z * 0.501), self_prerot)
 
     local canvas = find_canvas(other_pos)
     if not canvas and not props.remover then
         local other_size = { x = rot_box_size.x, y = rot_box_size.y }
         canvas = create_canvas(
-            other_node_pos, other_pos, self_rot, other_size, bitmap_size)
+            other_node_pos, other_pos, props.self_rot, other_size, bitmap_size)
     end
     if not canvas then return end
 
