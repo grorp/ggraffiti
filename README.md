@@ -56,6 +56,12 @@ If you want to remove a lot of graffiti at once, you can simply dig the affected
 
 ## Changelog
 
+`v1.0.0-alpha.13` (May 19, 2023)
+
+- The "different brush sizes" feature is now considered stable.
+- Performance improvements
+- Small bugfixes and improvements
+
 `v1.0.0-alpha.12` (May 3, 2023)
 
 - Adjustments to the behavior when drawing across multiple nodes of which only some are protected (this is not a bugfix)
