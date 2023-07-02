@@ -36,10 +36,6 @@ local function nearly_equal(a, b)
     return math.abs(a - b) < shared.EPSILON
 end
 
-local function vector_length_sq(v)
-    return v.x * v.x + v.y * v.y + v.z * v.z
-end
-
 -- `vector_prerot_pre` and `vector_prerot` are a split version of `vector.rotate`.
 -- https://github.com/minetest/minetest/blob/15fb4cab15c8d57028a2f616e1b443e8dc02e4f9/builtin/common/vector.lua#L309-L340
 
@@ -125,7 +121,7 @@ function shared.spraycast(player, pos, dir, def)
     end
     if not pthing or pthing.type ~= "node" or
             -- `pthing.intersection_normal == vector.zero()` if you're inside a node
-            not nearly_equal(vector_length_sq(pthing.intersection_normal), 1) then
+            pthing.intersection_normal == vector.zero() then
         return
     end
 
