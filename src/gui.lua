@@ -2,7 +2,7 @@ local shared = ...
 local gui = flow.widgets
 local S = minetest.get_translator("ggraffiti")
 
-local FORMSPEC_MIN_WIDTH = 6
+local FORMSPEC_MIN_WIDTH = 7
 -- named as in the Minetest Modding Book
 local FORMSPEC_PADDING = 0.4
 local FORMSPEC_SPACING = 0.25
