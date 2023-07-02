@@ -6,6 +6,7 @@ local FORMSPEC_MIN_WIDTH = 6
 -- named as in the Minetest Modding Book
 local FORMSPEC_PADDING = 0.4
 local FORMSPEC_SPACING = 0.25
+local FORMSPEC_LOWSPACING = 0.1
 
 -- In formspecs, I use server-side translations so that the layout of the
 -- formspecs can adapt to the length of the translated strings.
@@ -21,11 +22,6 @@ end
 function shared.get_raw_spray_def(item)
     local def = item:get_definition()
     return def and def._ggraffiti_spray_can
-end
-
-local available_sizes = {}
-for size = 1, 5 do
-    table.insert(available_sizes, size)
 end
 
 function shared.meta_get_size(meta)
@@ -74,16 +70,69 @@ end
 
 local gui_configure
 local gui_change_rgb_color
-local gui_change_size
 
 local function make_color_texture(color)
     local png = minetest.encode_png(1, 1, { color }, 9)
     return "[png:" .. minetest.encode_base64(png)
 end
 
-local function get_gui_size_str(player, size)
-    return size == 1 and ServerS(player, "1 pixel") or
-        ServerS(player, "@1 pixels", size)
+local function is_correct_item(ctx, item)
+    if ctx.item_name ~= item:get_name() then
+        return false
+    end
+
+    local meta = item:get_meta()
+    local rgb_color = shared.meta_get_rgb_color(meta)
+    if not (ctx.rgb_color == nil and rgb_color == nil) and
+            not (ctx.rgb_color ~= nil and rgb_color ~= nil and
+            ctx.rgb_color.r == rgb_color.r and
+            ctx.rgb_color.g == rgb_color.g and
+            ctx.rgb_color.b == rgb_color.b) then
+        return false
+    end
+
+    local size = shared.meta_get_size(meta)
+    if ctx.size ~= size then
+        return false
+    end
+
+    return true
+end
+
+local function make_size_button(selected_size, size)
+    if size == selected_size then
+        -- centering won't work without the gui.Stack ¯\_(ツ)_/¯
+        return gui.Stack {
+            gui.Label {
+                w = 0.8,
+                h = 0.8,
+                label = tostring(size),
+                align_h = "centre",
+            },
+        }
+    end
+
+    return gui.Button {
+        w = 0.8,
+        label = tostring(size),
+        on_event = function(player, ctx)
+            local item = player:get_wielded_item()
+
+            if is_correct_item(ctx, item) then
+                local meta = item:get_meta()
+                meta_set_size(item, meta, size)
+                player:set_wielded_item(item)
+
+                gui_configure:show(player, {
+                    item_name = ctx.item_name,
+                    item_desc = ctx.item_desc,
+                    is_rgb = ctx.is_rgb,
+                    rgb_color = ctx.rgb_color,
+                    size = size,
+                })
+            end
+        end,
+    }
 end
 
 gui_configure = flow.make_gui(function(player, ctx)
@@ -125,24 +174,18 @@ gui_configure = flow.make_gui(function(player, ctx)
         } or gui.Nil {},
         gui.HBox {
             spacing = FORMSPEC_SPACING,
-            gui.VBox {
-                spacing = 0,
+            gui.Label {
+                label = ServerS(player, "Size"),
                 expand = true,
                 align_h = "left",
-                gui.Label { label = ServerS(player, "Size") },
-                gui.Label { label = get_gui_size_str(player, ctx.size) },
             },
-            gui.Button {
-                label = ServerS(player, "Change"),
-                on_event = function(player, ctx)
-                    gui_change_size:show(player, {
-                        item_name = ctx.item_name,
-                        item_desc = ctx.item_desc,
-                        is_rgb = ctx.is_rgb,
-                        rgb_color = ctx.rgb_color,
-                        size = ctx.size,
-                    })
-                end,
+            gui.HBox {
+                spacing = FORMSPEC_LOWSPACING,
+                make_size_button(ctx.size, 1),
+                make_size_button(ctx.size, 2),
+                make_size_button(ctx.size, 3),
+                (ctx.size ~= 1 and ctx.size ~= 2 and ctx.size ~= 3) and
+                    make_size_button(ctx.size, ctx.size) or gui.Nil {},
             },
         },
     }
@@ -164,30 +207,7 @@ local function cancel_button_on_event(player, ctx)
     })
 end
 
-local function is_correct_item(ctx, item)
-    if ctx.item_name ~= item:get_name() then
-        return false
-    end
-
-    local meta = item:get_meta()
-    local rgb_color = shared.meta_get_rgb_color(meta)
-    if not (ctx.rgb_color == nil and rgb_color == nil) and
-            not (ctx.rgb_color ~= nil and rgb_color ~= nil and
-            ctx.rgb_color.r == rgb_color.r and
-            ctx.rgb_color.g == rgb_color.g and
-            ctx.rgb_color.b == rgb_color.b) then
-        return false
-    end
-
-    local size = shared.meta_get_size(meta)
-    if ctx.size ~= size then
-        return false
-    end
-
-    return true
-end
-
-local function change_rgb_color_save_button_on_event(player, ctx)
+local function save_button_on_event(player, ctx)
     -- We have to do this again here because this callback isn't
     -- always called after the others.
     ctx.form.field_r = adjust_field_value(ctx.form.field_r)
@@ -238,7 +258,7 @@ gui_change_rgb_color = flow.make_gui(function(player, ctx)
                 ServerS(player, "Change Color"),
         },
         gui.VBox {
-            spacing = FORMSPEC_SPACING,
+            spacing = FORMSPEC_LOWSPACING,
             gui.HBox {
                 spacing = FORMSPEC_SPACING,
                 gui.Field {
@@ -304,70 +324,7 @@ gui_change_rgb_color = flow.make_gui(function(player, ctx)
             gui.Button {
                 label = ServerS(player, "Save"),
                 expand = true,
-                on_event = change_rgb_color_save_button_on_event,
-            },
-        },
-    }
-end)
-
-local function find_index(list, item)
-    for l_idx, l_item in ipairs(list) do
-        if l_item == item then
-            return l_idx
-        end
-    end
-end
-
-local function change_size_save_button_on_event(player, ctx)
-    local size = available_sizes[ctx.form.dropdown_size]
-
-    if size then
-        local item = player:get_wielded_item()
-        if is_correct_item(ctx, item) then
-            local meta = item:get_meta()
-            meta_set_size(item, meta, size)
-            player:set_wielded_item(item)
-
-            gui_configure:show(player, {
-                item_name = ctx.item_name,
-                item_desc = ctx.item_desc,
-                is_rgb = ctx.is_rgb,
-                rgb_color = ctx.rgb_color,
-                size = size,
-            })
-        end
-    end
-end
-
-gui_change_size = flow.make_gui(function(player, ctx)
-    local available_size_strs = {}
-    for _, size in ipairs(available_sizes) do
-        table.insert(available_size_strs, get_gui_size_str(player, size))
-    end
-
-    return gui.VBox {
-        min_w = FORMSPEC_MIN_WIDTH,
-        padding = FORMSPEC_PADDING,
-        spacing = FORMSPEC_PADDING,
-
-        gui.Label { label = ServerS(player, "Change Size") },
-        gui.Dropdown {
-            name = "dropdown_size",
-            items = available_size_strs,
-            selected_idx = find_index(available_sizes, ctx.size),
-            index_event = true,
-        },
-        gui.HBox {
-            spacing = FORMSPEC_SPACING,
-            gui.Button {
-                label = ServerS(player, "Cancel"),
-                expand = true,
-                on_event = cancel_button_on_event,
-            },
-            gui.Button {
-                label = ServerS(player, "Save"),
-                expand = true,
-                on_event = change_size_save_button_on_event,
+                on_event = save_button_on_event,
             },
         },
     }
