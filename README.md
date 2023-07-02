@@ -11,8 +11,8 @@ This Minetest mod adds graffiti that lets you paint whatever you want on any nod
 Features:
 
 - Paint pixel-by-pixel on any node
-- Different sizes: Paint up to 5×5 pixels at a time
-- Paint in custom colors with the RGB spray can
+- Paint with custom colors using the RGB spray can
+- Different sizes: Paint up to 3×3 pixels at a time
 - Remove graffiti with the eraser-like "remover" spray can or by digging the sprayed nodes
 - Respects protection mods
 - Compatible with Minetest Game and MineClone 2
@@ -55,6 +55,13 @@ If you want to remove a lot of graffiti at once, you can simply dig the affected
   Something like this, but for NodeCore.
 
 ## Changelog
+
+`v1.0.0-alpha.14` (Jul 2, 2023)
+
+- Reduce the maximum spray size to 3
+- Show the RGB value of built-in colors in the GUI
+- Small GUI improvements
+- Small internal improvements
 
 `v1.0.0-alpha.13` (May 19, 2023)
 
