@@ -37,7 +37,7 @@ if not flow.widgets or not rawget(flow.widgets, "Nil") then
     dependency_version_error("Flow")
 end
 
--- For the largest available spray size (5×5=25 pixels), this results in 12 seconds.
+-- For the largest available spray size (3×3=9 pixels), this results in 33.33 seconds.
 shared.SPRAY_DURATION = 5 * 60
 -- Clients send the position of their player every 0.1 seconds.
 -- https://github.com/minetest/minetest/blob/5.6.1/src/client/client.h#L563
