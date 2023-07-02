@@ -71,6 +71,12 @@ end
 local gui_configure
 local gui_change_rgb_color
 
+local function get_color(item_name)
+    local def = minetest.registered_items[item_name]._ggraffiti_spray_can
+    local r, g, b = def.color:sub(2):match("(..)(..)(..)")
+    return { r = tonumber(r, 16), g = tonumber(g, 16), b = tonumber(b, 16) }
+end
+
 local function make_color_texture(color)
     local png = minetest.encode_png(1, 1, { color }, 9)
     return "[png:" .. minetest.encode_base64(png)
@@ -136,13 +142,15 @@ local function make_size_button(selected_size, size)
 end
 
 gui_configure = flow.make_gui(function(player, ctx)
+    local color = ctx.is_rgb and ctx.rgb_color or get_color(ctx.item_name)
+
     return gui.VBox {
         min_w = FORMSPEC_MIN_WIDTH,
         padding = FORMSPEC_PADDING,
         spacing = FORMSPEC_PADDING,
 
         gui.label { label = ServerSDouble(player, ctx.item_desc) },
-        ctx.is_rgb and gui.HBox {
+        gui.HBox {
             spacing = FORMSPEC_SPACING,
             gui.VBox {
                 spacing = 0,
@@ -151,15 +159,15 @@ gui_configure = flow.make_gui(function(player, ctx)
                 gui.Label { label = ServerS(player, "Color") },
                 gui.Label {
                     label = ServerS(player, "R: @1, G: @2, B: @3",
-                        ctx.rgb_color.r, ctx.rgb_color.g, ctx.rgb_color.b),
+                        color.r, color.g, color.b),
                 },
             },
             gui.Image {
                 w = 0.8,
                 h = 0.8,
-                texture_name = make_color_texture(ctx.rgb_color),
+                texture_name = make_color_texture(color),
             },
-            gui.Button {
+            ctx.is_rgb and gui.Button {
                 label = ServerS(player, "Change"),
                 on_event = function(player, ctx)
                     gui_change_rgb_color:show(player, {
@@ -170,8 +178,8 @@ gui_configure = flow.make_gui(function(player, ctx)
                         size = ctx.size,
                     })
                 end,
-            },
-        } or gui.Nil {},
+            } or gui.Nil {},
+        },
         gui.HBox {
             spacing = FORMSPEC_SPACING,
             gui.Label {
