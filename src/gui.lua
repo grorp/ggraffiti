@@ -72,8 +72,9 @@ local gui_configure
 local gui_change_rgb_color
 
 local function get_color(item_name)
-    local def = minetest.registered_items[item_name]._ggraffiti_spray_can
-    local r, g, b = def.color:sub(2):match("(..)(..)(..)")
+    local hex = minetest.registered_items[item_name]._ggraffiti_spray_can.color
+    if not hex then return end
+    local r, g, b = hex:sub(2):match("(..)(..)(..)")
     return { r = tonumber(r, 16), g = tonumber(g, 16), b = tonumber(b, 16) }
 end
 
@@ -109,6 +110,15 @@ local function make_size_button(selected_size, size)
     if size == selected_size then
         -- centering won't work without the gui.Stack ¯\_(ツ)_/¯
         return gui.Stack {
+            -- prevent MineClone 2 formspec_prepend from interfering with Flow's
+            -- centering hack
+            gui.StyleType {
+                selectors = { "image_button", "image_button:pressed" },
+                props = {
+                    bgimg = "",
+                    bgimg_pressed = "",
+                },
+            },
             gui.Label {
                 w = 0.8,
                 h = 0.8,
@@ -150,7 +160,7 @@ gui_configure = flow.make_gui(function(player, ctx)
         spacing = FORMSPEC_PADDING,
 
         gui.label { label = ServerSDouble(player, ctx.item_desc) },
-        gui.HBox {
+        color and gui.HBox {
             spacing = FORMSPEC_SPACING,
             gui.VBox {
                 spacing = 0,
@@ -179,7 +189,7 @@ gui_configure = flow.make_gui(function(player, ctx)
                     })
                 end,
             } or gui.Nil {},
-        },
+        } or gui.Nil {},
         gui.HBox {
             spacing = FORMSPEC_SPACING,
             gui.Label {
