@@ -60,6 +60,10 @@ function CanvasEntity:on_activate(staticdata)
 
         if data.node_offset then
             self.node_offset = vector.copy(data.node_offset) -- add metatable
+        else
+            local node_pos = self.object:get_pos() + vector.new(0, 0, -0.1):rotate(self.object:get_rotation())
+            node_pos = node_pos:round()
+            self.node_offset = node_pos - self.object:get_pos()
         end
         self.size = data.size
         self.bitmap_size = data.bitmap_size
@@ -169,9 +173,7 @@ function CanvasEntity:get_staticdata()
 end
 
 function CanvasEntity:get_node_pos()
-    if self.node_offset then
-        return (self.object:get_pos() + self.node_offset):apply(math.round)
-    end
+    return (self.object:get_pos() + self.node_offset):round()
 end
 
 minetest.register_entity("ggraffiti:canvas", CanvasEntity)
@@ -197,7 +199,7 @@ minetest.register_on_dignode(function(pos)
         local ent = obj:get_luaentity()
         if ent and ent.name == "ggraffiti:canvas" then
             local node_pos = ent:get_node_pos()
-            if pos == node_pos then -- fancy overloaded `==` operator
+            if pos == node_pos then
                 obj:remove()
             end
         end
