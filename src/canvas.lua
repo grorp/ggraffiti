@@ -106,9 +106,8 @@ function CanvasEntity:update_immediately()
         visual_size = vector.new(self.size.x, self.size.y, 0),
         textures = {
             "[png:" .. png,
-            "[png:" .. png .. "^[transformFX",
             -- "ggraffiti_debug_coordinates.png^([png:" .. png .. "^[resize:128x128)",
-            -- "ggraffiti_debug_coordinates.png^([png:" .. png .. "^[resize:128x128)^[transformFX",
+            "blank.png",
         },
     })
 end
