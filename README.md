@@ -56,6 +56,10 @@ If you want to remove a lot of graffiti at once, you can simply dig the affected
 
 ## Changelog
 
+`v1.0.0-alpha.16` (Jul 7, 2023)
+
+- Possibly improve performance
+
 `v1.0.0-alpha.15` (Jul 2, 2023)
 
 - Reduce the maximum spray size to 3
