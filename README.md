@@ -15,7 +15,7 @@ Features:
 - Different sizes: Paint up to 3×3 pixels at a time
 - Remove graffiti with the eraser-like "remover" spray can or by digging the sprayed nodes
 - Respects protection mods
-- Compatible with Minetest Game and MineClone 2
+- Compatible with Minetest Game, MineClone 2 and Mineclonia
 
 This mod is a Work in Progress.
 
