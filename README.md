@@ -29,7 +29,7 @@ Press and hold the dig button (the left mouse button) to paint. Press the place 
 
 After some time, the spray can will be empty. You can smelt spray cans, empty or not, to get the two steel ingots back. Of course, you can replace the cyan dye in the recipe with any dye you like.
 
-If you are playing on Android: For the best spraying experience, enable `Settings` → `All Settings` → `touch_use_crosshair`.
+If you are playing on Android: For the best spraying experience, enable `Settings` → `Touchscreen` → `touch_use_crosshair`.
 
 **RGB Graffiti Spray Can**
 
@@ -56,47 +56,7 @@ If you want to remove a lot of graffiti at once, you can simply dig the affected
 
 ## Changelog
 
-`v1.0.0-alpha.16` (Jul 7, 2023)
-
-- Possibly improve performance
-
-`v1.0.0-alpha.15` (Jul 2, 2023)
-
-- Reduce the maximum spray size to 3
-- Show the RGB value of built-in colors in the GUI
-- Small GUI improvements
-- Small internal improvements
-
-`v1.0.0-alpha.13` (May 19, 2023)
-
-- The "different brush sizes" feature is now considered stable.
-- Performance improvements
-- Small bugfixes and improvements
-
-`v1.0.0-alpha.12` (May 3, 2023)
-
-- Adjustments to the behavior when drawing across multiple nodes of which only some are protected (this is not a bugfix)
-- Adjustments to spacing in GUIs
-- Show the selected size of spray cans in the hotbar and the inventory
-- Show the selected color of RGB spray cans in the hotbar and the inventory [only works on 5.8.0-dev clients]
-
-`v1.0.0-alpha.11` (Apr 30, 2023)
-
-- Experimental support for painting with different "brush sizes"
-
-`v1.0.0-alpha.10` (Mar 12, 2023)
-
-- Support for MineClone 2
-
-`v1.0.0-alpha.9` (Mar 4, 2023)
-
-- Addition of the "RGB Graffiti Spray Can"
-- New textures that were contributed by Tim79000
-
-`v1.0.0-alpha.8` (Feb 24, 2023)
-
-- Graffiti is now removed when you dig the node it is attached to.
-- Performance improvements
+See https://github.com/grorp/ggraffiti/commits.
 
 ## License
 
