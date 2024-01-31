@@ -214,22 +214,27 @@ function shared.spraycast(player, pos, dir, def)
 
             if exceeds_left then
                 spread_offset(-1, 0)
-            elseif exceeds_right then
+            end
+            if exceeds_right then
                 spread_offset(1, 0)
             end
             if exceeds_top then
                 spread_offset(0, -1)
-            elseif exceeds_bottom then
+            end
+            if exceeds_bottom then
                 spread_offset(0, 1)
             end
 
             if exceeds_left and exceeds_top then
                 spread_offset(-1, -1)
-            elseif exceeds_left and exceeds_bottom then
+            end
+            if exceeds_left and exceeds_bottom then
                 spread_offset(-1, 1)
-            elseif exceeds_right and exceeds_top then
+            end
+            if exceeds_right and exceeds_top then
                 spread_offset(1, -1)
-            elseif exceeds_right and exceeds_bottom then
+            end
+            if exceeds_right and exceeds_bottom then
                 spread_offset(1, 1)
             end
         end
