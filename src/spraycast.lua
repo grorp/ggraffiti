@@ -3,6 +3,15 @@ local shared = ...
 local is_protected_cache = {}
 local get_node_selectionboxes_cache = {}
 
+local function is_sprayable(pos)
+    local node = minetest.get_node(pos)
+    local def = minetest.registered_nodes[node.name]
+    if def and def.drawtype == "plantlike" then
+        return false
+    end
+    return true
+end
+
 local function is_protected_cached(pos, player_name)
     local key = pos.x .. ":" .. pos.y .. ":" .. pos.z .. ":" .. player_name
     local result = is_protected_cache[key]
@@ -114,7 +123,8 @@ function shared.spraycast(player, pos, dir, def)
     local ray = minetest.raycast(pos, pos + dir * shared.MAX_SPRAY_DISTANCE, true, false)
     local pthing
     for i_pthing in ray do
-        if i_pthing.ref ~= player then
+        if not (i_pthing.type == "object" and i_pthing.ref == player) and
+                not (i_pthing.type == "node" and not is_sprayable(i_pthing.under)) then
             pthing = i_pthing
             break
         end
@@ -244,7 +254,8 @@ function shared.spraycast(player, pos, dir, def)
 end
 
 spread_rect_to_node = function(props, other_node_pos, skip_box_id)
-    if is_protected_cached(other_node_pos, props.player_name) then
+    if not is_sprayable(other_node_pos) or
+            is_protected_cached(other_node_pos, props.player_name) then
         return
     end
     local raw_boxes = get_node_selectionboxes_cached(other_node_pos)
