@@ -60,7 +60,7 @@ See https://github.com/grorp/ggraffiti/commits.
 
 ## License
 
-© 2022 Gregor Parzefall
+© 2024 Gregor Parzefall
 
 Source code (everything except image and audio files) available under the [GNU AGPL version 3.0](https://www.gnu.org/licenses/agpl-3.0.html) or any later version, media (image and audio files) available under the [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
 

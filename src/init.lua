@@ -14,6 +14,7 @@ else
         'No supported game found. Supported games are:\n' ..
         ' - Minetest Game\n' ..
         ' - MineClone 2\n' ..
+        ' - Mineclonia\n' ..
         "────────────────────────────────────────────────────────────────────────────────────────────────────\n",
         0
     )
