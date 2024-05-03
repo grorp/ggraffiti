@@ -139,7 +139,8 @@ local function make_size_button(selected_size, size)
     }
 end
 
-gui_configure = flow.make_gui(function(player, ctx)
+gui_configure = flow.make_gui(function(_, ctx)
+    -- luacheck: no unused args, no redefined
     local color = ctx.is_rgb and ctx.rgb_color or get_color(ctx.item_name)
 
     return gui.VBox {
@@ -240,7 +241,8 @@ local function save_button_on_event(player, ctx)
     end
 end
 
-gui_change_rgb_color = flow.make_gui(function(player, ctx)
+gui_change_rgb_color = flow.make_gui(function(_, ctx)
+    -- luacheck: no unused args, no redefined
     local has_input_color = not not (ctx.form.field_r and ctx.form.field_g and ctx.form.field_b)
     local has_default_color = not ctx.initial_setup
     local preview_color

@@ -46,7 +46,7 @@ local function nearly_equal(a, b)
 end
 
 -- `vector_prerot_pre` and `vector_prerot` are a split version of `vector.rotate`.
--- https://github.com/minetest/minetest/blob/15fb4cab15c8d57028a2f616e1b443e8dc02e4f9/builtin/common/vector.lua#L309-L340
+-- https://github.com/minetest/minetest/blob/15fb4cab15c8d57028a2/builtin/common/vector.lua#L309-L340
 
 local function vector_prerot_pre(rot)
     local sinpitch = math.sin(-rot.x)
