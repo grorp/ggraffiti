@@ -160,7 +160,7 @@ function shared.spraycast(player, pos, dir, def)
 
     if not is_protected then
         local canvas_pos = node_pos + box_center +
-            vector_prerot(vector.new(0, 0, rot_box_size.z * 0.501), canvas_prerot)
+            vector_prerot(vector.new(0, 0, rot_box_size.z * shared.CANVAS_OFFSET), canvas_prerot)
         canvas = find_canvas(canvas_pos)
 
         if not canvas and not def.remover then
@@ -306,7 +306,7 @@ spread_rect_to_box = function(props, other_node_pos, raw_box)
     end
 
     local other_pos = other_node_pos + box_center +
-            vector_prerot(vector.new(0, 0, rot_box_size.z * 0.501), self_prerot)
+            vector_prerot(vector.new(0, 0, rot_box_size.z * shared.CANVAS_OFFSET), self_prerot)
 
     local canvas = find_canvas(other_pos)
     if not canvas and not props.remover then

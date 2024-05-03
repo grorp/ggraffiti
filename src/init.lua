@@ -50,6 +50,7 @@ shared.MAX_SPRAY_DISTANCE = 4
 shared.DESIRED_PIXEL_SIZE = 1/16
 shared.TRANSPARENT = "#00000000"
 
+shared.CANVAS_OFFSET = 0.501
 shared.EPSILON = 0.0001
 
 if shared.game == "mtg" then
