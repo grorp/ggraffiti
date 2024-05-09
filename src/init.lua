@@ -53,6 +53,8 @@ shared.TRANSPARENT = "#00000000"
 shared.CANVAS_OFFSET = 0.501
 shared.EPSILON = 0.0001
 
+shared.SELF_TEST = false
+
 if shared.game == "mtg" then
     -- Creative inventory concept:
     -- All spray cans: "Tools"

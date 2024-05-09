@@ -112,7 +112,17 @@ function CanvasEntity:update_immediately()
     })
 end
 
+local function clamp(val, min, max)
+    return math.min(math.max(val, min), max)
+end
+
+-- x and y are 0-based.
+-- If the pixel is outside the canvas area, nothing will be drawn.
 function CanvasEntity:draw_pixel(x, y, color, remover)
+    if x < 0 or x > self.bitmap_size.x - 1 or
+            y < 0 or y > self.bitmap_size.y - 1 then
+        return
+    end
     local index = y * self.bitmap_size.x + x + 1
 
     if self.bitmap[index] ~= color then
@@ -126,11 +136,13 @@ function CanvasEntity:draw_pixel(x, y, color, remover)
     end
 end
 
-local function clamp(val, min, max)
-    return math.min(math.max(val, min), max)
-end
-
+-- x and y are 0-based.
+-- To get correct results, at least one pixel of the rectangle must be inside
+-- the canvas area. If this requirement is not fulfilled, the result will be
+-- incorrect, but the canvas data will not become invalid.
 function CanvasEntity:draw_rect(x, y, size, color, remover)
+    assert(size >= 1)
+
     local max_x = self.bitmap_size.x - 1
     local max_y = self.bitmap_size.y - 1
     local x1, y1 =
@@ -150,6 +162,71 @@ function CanvasEntity:draw_rect(x, y, size, color, remover)
         self.object:remove()
     else
         self:update_later()
+    end
+end
+
+if shared.SELF_TEST then
+    -- Tests for self-invalidating canvases.
+
+    local function test_canvas(test_fn)
+        local test = {
+            bitmap_size = {x = 38, y = 19},
+            bitmap = {},
+            update_later = function() end,
+        }
+        for i = 1, test.bitmap_size.x * test.bitmap_size.y do
+            test.bitmap[i] = "#ff0000"
+        end
+
+        test_fn(test)
+
+        -- no # operator since I want all keys, not just consecutive positive
+        -- integer keys
+        local count = 0
+        for k, v in pairs(test.bitmap) do
+            count = count + 1
+        end
+        assert(count == test.bitmap_size.x * test.bitmap_size.y)
+
+        for i = 1, test.bitmap_size.x * test.bitmap_size.y do
+            -- lua_api.md on minetest.colorspec_to_colorstring:
+            -- If the ColorSpec is invalid, returns nil.
+            assert(minetest.colorspec_to_colorstring(test.bitmap[i]) ~= nil)
+        end
+    end
+
+    -- Test draw_pixel.
+    test_canvas(function(test)
+        print("[test] draw_pixel fill")
+        for x = 0, test.bitmap_size.x - 1 do
+            for y = 0, test.bitmap_size.y - 1 do
+                CanvasEntity.draw_pixel(test, x, y, "#00ff00", false)
+            end
+        end
+        for i = 1, test.bitmap_size.x * test.bitmap_size.y do
+            assert(test.bitmap[i] == "#00ff00")
+        end
+    end)
+
+    for x = -50, 50 do
+        for y = -50, 50 do
+            test_canvas(function(test)
+                print("[test] draw_pixel at (" .. x .. ", " .. y .. ")")
+                CanvasEntity.draw_pixel(test, x, y, "#00ff00", false)
+            end)
+        end
+    end
+
+    -- Test draw_rect.
+    for x = -50, 50 do
+        for y = -50, 50 do
+            for size = 1, 12 do
+                test_canvas(function(test)
+                    print("[test] draw_rect at (" .. x .. ", " .. y .. ") size=" .. size)
+                    CanvasEntity.draw_rect(test, x, y, size, "#00ff00", false)
+                end)
+            end
+        end
     end
 end
 
