@@ -183,7 +183,7 @@ if shared.SELF_TEST then
         -- no # operator since I want all keys, not just consecutive positive
         -- integer keys
         local count = 0
-        for k, v in pairs(test.bitmap) do
+        for _, _ in pairs(test.bitmap) do
             count = count + 1
         end
         assert(count == test.bitmap_size.x * test.bitmap_size.y)
