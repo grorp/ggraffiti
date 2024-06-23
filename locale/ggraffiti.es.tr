@@ -1,0 +1,54 @@
+# textdomain: ggraffiti
+
+Empty Spray Can=Aerosol vacío
+
+Graffiti Spray Can (White)=Aerosol blanco
+Graffiti Spray Can (Grey)=Aerosol gris
+Graffiti Spray Can (Dark Grey)=Aerosol gris oscuro
+Graffiti Spray Can (Black)=Aerosol negro
+Graffiti Spray Can (Violet)=Aerosol violeta
+Graffiti Spray Can (Blue)=Aerosol azul
+Graffiti Spray Can (Cyan)=Aerosol cian
+Graffiti Spray Can (Dark Green)=Aerosol verde oscuro
+Graffiti Spray Can (Green)=Aerosol verde
+Graffiti Spray Can (Yellow)=Aerosol amarillo
+Graffiti Spray Can (Brown)=Aerosol marrón
+Graffiti Spray Can (Orange)=Aerosol naranja
+Graffiti Spray Can (Red)=Aerosol rojo
+Graffiti Spray Can (Magenta)=Aerosol magenta
+Graffiti Spray Can (Pink)=Aerosol rosa
+
+Graffiti Spray Can (Light Grey)=Aerosol gris claro
+Graffiti Spray Can (Purple)=Aerosol púrpura
+Graffiti Spray Can (Light Blue)=Aerosol azul claro
+Graffiti Spray Can (Lime)=Aerosol lima
+
+RGB Graffiti Spray Can=Aerosol RGB
+Red Mushroom Extract=Extracto de champiñón rojo
+Graffiti Remover Spray Can=Aerosol removedor
+
+Left-click to spray, right-click to configure.=Botón izquierdo para pulverizar, botón derecho para configurar.
+No color set.=Color no definido.
+Color: @1 @2, @3, @4=Color: @1 @2, @3, @4
+Size: @1=Grosor: @1
+
+Set Color=Definir color
+Change Color=Cambiar color
+Change Size=Cambiar tamaño
+[Experimental]=[Experimental]
+
+Color=Color
+R: @1, G: @2, B: @3=R: @1, G: @2, B: @3
+Size=Grosor
+1 pixel=1 píxel
+@1 pixels=@1 píxeles
+Change=Cambiar
+
+R (Red)=R (Rojo)
+G (Green)=G (Verde)
+B (Blue)=B (Azul)
+Values must be integers between 0 and 255.=Los valores deben ser números enteros entre 0 y 255.
+Preview=Vista previa
+Update=Actualizar
+Cancel=Cancelar
+Save=Guardar
