@@ -34,14 +34,10 @@ Size: @1=
 
 Set Color=
 Change Color=
-Change Size=
-[Experimental]=
 
 Color=
 R: @1, G: @2, B: @3=
 Size=
-1 pixel=
-@1 pixels=
 Change=
 
 R (Red)=

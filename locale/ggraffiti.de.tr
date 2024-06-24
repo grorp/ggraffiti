@@ -34,14 +34,10 @@ Size: @1=Größe: @1
 
 Set Color=Farbe festlegen
 Change Color=Farbe ändern
-Change Size=Größe ändern
-[Experimental]=[Experimentell]
 
 Color=Farbe
 R: @1, G: @2, B: @3=R: @1, G: @2, B: @3
 Size=Größe
-1 pixel=1 Pixel
-@1 pixels=@1 Pixel
 Change=Ändern
 
 R (Red)=R (Rot)
