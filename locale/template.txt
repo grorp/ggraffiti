@@ -1,0 +1,54 @@
+# textdomain: ggraffiti
+
+Empty Spray Can=
+
+Graffiti Spray Can (White)=
+Graffiti Spray Can (Grey)=
+Graffiti Spray Can (Dark Grey)=
+Graffiti Spray Can (Black)=
+Graffiti Spray Can (Violet)=
+Graffiti Spray Can (Blue)=
+Graffiti Spray Can (Cyan)=
+Graffiti Spray Can (Dark Green)=
+Graffiti Spray Can (Green)=
+Graffiti Spray Can (Yellow)=
+Graffiti Spray Can (Brown)=
+Graffiti Spray Can (Orange)=
+Graffiti Spray Can (Red)=
+Graffiti Spray Can (Magenta)=
+Graffiti Spray Can (Pink)=
+
+Graffiti Spray Can (Light Grey)=
+Graffiti Spray Can (Purple)=
+Graffiti Spray Can (Light Blue)=
+Graffiti Spray Can (Lime)=
+
+RGB Graffiti Spray Can=
+Red Mushroom Extract=
+Graffiti Remover Spray Can=
+
+Left-click to spray, right-click to configure.=
+No color set.=
+Color: @1 @2, @3, @4=
+Size: @1=
+
+Set Color=
+Change Color=
+Change Size=
+[Experimental]=
+
+Color=
+R: @1, G: @2, B: @3=
+Size=
+1 pixel=
+@1 pixels=
+Change=
+
+R (Red)=
+G (Green)=
+B (Blue)=
+Values must be integers between 0 and 255.=
+Preview=
+Update=
+Cancel=
+Save=
