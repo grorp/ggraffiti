@@ -86,7 +86,7 @@ function shared.get_colored_can_texmod(color)
     return "ggraffiti_spray_can.png^(ggraffiti_spray_can_color.png^[multiply:" .. color .. ")"
 end
 
-for _, dye in ipairs(shared.game_dyes) do
+for _, dye in ipairs(shared.game_dyes or {}) do
     local item_name = "ggraffiti:spray_can_" .. dye.name
 
     core.register_tool(item_name, {
@@ -134,25 +134,27 @@ core.register_tool("ggraffiti:spray_can_rgb", {
     groups = { ggraffiti_spray_can = 1 },
 })
 
-core.register_craft({
-    recipe = {
-        { "",                        shared.game_items.iron_ingot, ""                         },
-        { shared.game_items.red_dye, shared.game_items.green_dye,  shared.game_items.blue_dye },
-        { "",                        shared.game_items.iron_ingot, ""                         },
-    },
-    output = "ggraffiti:spray_can_rgb",
-})
+if shared.game_items then
+    core.register_craft({
+        recipe = {
+            { "",                        shared.game_items.iron_ingot, ""                         },
+            { shared.game_items.red_dye, shared.game_items.green_dye,  shared.game_items.blue_dye },
+            { "",                        shared.game_items.iron_ingot, ""                         },
+        },
+        output = "ggraffiti:spray_can_rgb",
+    })
 
-core.register_craftitem("ggraffiti:mushroom_red_extract", {
-    description = S("Red Mushroom Extract"),
-    inventory_image = "ggraffiti_mushroom_red_extract.png",
-    groups = { craftitem = shared.game == "mcl" and 1 or nil },
-})
+    core.register_craftitem("ggraffiti:mushroom_red_extract", {
+        description = S("Red Mushroom Extract"),
+        inventory_image = "ggraffiti_mushroom_red_extract.png",
+        groups = { craftitem = shared.game == "mcl" and 1 or nil },
+    })
 
-core.register_craft({
-    recipe = {{ shared.game_items.red_mushroom }},
-    output = "ggraffiti:mushroom_red_extract " .. shared.game_items.red_mushroom_extract_count,
-})
+    core.register_craft({
+        recipe = {{ shared.game_items.red_mushroom }},
+        output = "ggraffiti:mushroom_red_extract " .. shared.game_items.red_mushroom_extract_count,
+    })
+end
 
 core.register_tool("ggraffiti:spray_can_remover", {
     description = S("Graffiti Remover Spray Can") .. "\n" ..
@@ -173,20 +175,22 @@ core.register_tool("ggraffiti:spray_can_remover", {
 
 core.register_alias("ggraffiti:spray_can_anti", "ggraffiti:spray_can_remover")
 
-core.register_craft({
-    recipe = {
-        { shared.game_items.iron_ingot     },
-        { "ggraffiti:mushroom_red_extract" },
-        { shared.game_items.iron_ingot     },
-    },
-    output = "ggraffiti:spray_can_remover",
-})
+if shared.game_items then
+    core.register_craft({
+        recipe = {
+            { shared.game_items.iron_ingot     },
+            { "ggraffiti:mushroom_red_extract" },
+            { shared.game_items.iron_ingot     },
+        },
+        output = "ggraffiti:spray_can_remover",
+    })
 
-core.register_craft({
-    type = "cooking",
-    recipe = "group:ggraffiti_spray_can",
-    output = shared.game_items.iron_ingot .. " 2",
-})
+    core.register_craft({
+        type = "cooking",
+        recipe = "group:ggraffiti_spray_can",
+        output = shared.game_items.iron_ingot .. " 2",
+    })
+end
 
 local function lerp_factory(t)
     return function(a, b)

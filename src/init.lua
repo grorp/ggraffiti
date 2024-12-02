@@ -18,17 +18,8 @@ elseif core.get_modpath("mcl_core") and core.get_modpath("mcl_dye") and
         core.get_modpath("mcl_mushrooms") then
     shared.game = "mcl"
 else
-    error(
-        '\n' ..
-        'GGraffiti\n' ..
-        "----------------------------------------------------------------------------------------------------\n" ..
-        'No supported game found. Supported games are:\n' ..
-        ' - Minetest Game\n' ..
-        ' - MineClone 2\n' ..
-        ' - Mineclonia\n' ..
-        "----------------------------------------------------------------------------------------------------\n",
-        0
-    )
+    shared.game = nil
+    core.log("warning", "GGraffiti: No supported game found, only limited features are available.")
 end
 
 local function dependency_version_error(mod_title)
@@ -129,7 +120,8 @@ elseif shared.game == "mcl" then
         { item_name = "mcl_dye:pink", name = "pink", desc = "Pink", color = "#e07dc1" },
     }
 else
-    error("Something is rotten in the state of Denmark.")
+    shared.game_items = nil
+    shared.game_dyes = nil
 end
 
 local basepath = core.get_modpath("ggraffiti") .. "/src"
