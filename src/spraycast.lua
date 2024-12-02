@@ -34,7 +34,15 @@ local function get_node_selectionboxes_cached(pos)
         return result
     end
 
-    local new_result = core.get_node_boxes("selection_box", pos)
+    local new_result
+    local def = core.registered_nodes[core.get_node(pos).name]
+    if def and not def.pointable then
+        -- don't allow paint to stick on e.g. air nodes
+        new_result = {}
+    else
+        new_result = core.get_node_boxes("selection_box", pos)
+    end
+
     get_node_selectionboxes_cache[key] = new_result
     return new_result
 end
