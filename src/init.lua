@@ -52,8 +52,6 @@ shared.TRANSPARENT = "#00000000"
 shared.CANVAS_OFFSET = 0.501
 shared.EPSILON = 0.0001
 
-shared.SELF_TEST = false
-
 if shared.game == "mtg" then
     -- Creative inventory concept:
     -- All spray cans: "Tools"
@@ -130,3 +128,7 @@ assert(loadfile(basepath .. "/canvas.lua"))(shared)
 assert(loadfile(basepath .. "/spraycast.lua"))(shared)
 assert(loadfile(basepath .. "/gui.lua"))(shared)
 assert(loadfile(basepath .. "/items.lua"))(shared)
+if false then
+    -- luacheck: ignore
+    assert(loadfile(basepath .. "/test.lua"))(shared)
+end
