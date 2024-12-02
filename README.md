@@ -1,8 +1,8 @@
 # GGraffiti
 
-[![ContentDB](https://content.minetest.net/packages/grorp/ggraffiti/shields/downloads/)](https://content.minetest.net/packages/grorp/ggraffiti/)
+[![ContentDB](https://content.luanti.org/packages/grorp/ggraffiti/shields/downloads/)](https://content.luanti.org/packages/grorp/ggraffiti/)
 
-This Minetest mod adds graffiti that lets you paint whatever you want on any node you want. It requires at least Minetest 5.6.0.
+This Luanti mod adds graffiti that lets you paint whatever you want on any node you want. It requires at least engine version 5.6.0.
 
 <img src="./docpics/screenshot_1.png" style="width: 512px;" />
 
@@ -15,7 +15,7 @@ Features:
 - Different sizes: Paint up to 3×3 pixels at a time
 - Remove graffiti with the eraser-like "remover" spray can or by digging the sprayed nodes
 - Respects protection mods
-- Compatible with Minetest Game, MineClone 2 and Mineclonia
+- Compatible with Minetest Game, Mineclonia and VoxeLibre
 
 This mod is a Work in Progress.
 
@@ -35,7 +35,7 @@ If you are playing on Android: For the best spraying experience, enable `Setting
 
 ![](./docpics/recipe_rgb_spray_can_mtg.png)
 
-A spray can that can paint in any 24-bit RGB color and thus in all colors supported by Minetest. Press the place button (the right mouse button) to change the selected color.
+A spray can that can paint in any 24-bit RGB color and thus in all colors supported by Luanti. Press the place button (the right mouse button) to change the selected color.
 
 **Red Mushroom Extract**
 

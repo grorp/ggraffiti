@@ -1,6 +1,6 @@
 local shared = ...
 local gui = flow.widgets
-local S = minetest.get_translator("ggraffiti")
+local S = core.get_translator("ggraffiti")
 
 local FORMSPEC_MIN_WIDTH = 7
 -- named as in the Minetest Modding Book
@@ -17,7 +17,7 @@ function shared.meta_get_size(meta)
     return tonumber(meta:get_string("ggraffiti_size")) or 1
 end
 function shared.meta_get_rgb_color(meta)
-    return minetest.deserialize(meta:get_string("ggraffiti_rgb_color"))
+    return core.deserialize(meta:get_string("ggraffiti_rgb_color"))
 end
 
 local function update_item_meta(item, meta)
@@ -28,8 +28,8 @@ local function update_item_meta(item, meta)
     meta:set_string("count_alignment", size == 1 and "" or "13") -- 1 + 3 * 4
     if spray_def.rgb then
         local color = shared.meta_get_rgb_color(meta)
-        local color_str = minetest.colorspec_to_colorstring(color)
-        local color_block = minetest.colorize(color_str, "█")
+        local color_str = core.colorspec_to_colorstring(color)
+        local color_block = core.colorize(color_str, "█")
 
         meta:set_string("description",
             item:get_short_description() .. "\n" ..
@@ -53,7 +53,7 @@ local function meta_set_size(item, meta, size)
     update_item_meta(item, meta)
 end
 local function meta_set_rgb_color(item, meta, color)
-    meta:set_string("ggraffiti_rgb_color", minetest.serialize(color))
+    meta:set_string("ggraffiti_rgb_color", core.serialize(color))
     update_item_meta(item, meta)
 end
 
@@ -61,14 +61,14 @@ local gui_configure
 local gui_change_rgb_color
 
 local function get_color(item_name)
-    local hex = minetest.registered_items[item_name]._ggraffiti_spray_can.color
+    local hex = core.registered_items[item_name]._ggraffiti_spray_can.color
     if not hex then return end
     local r, g, b = hex:sub(2):match("(..)(..)(..)")
     return { r = tonumber(r, 16), g = tonumber(g, 16), b = tonumber(b, 16) }
 end
 
 local function make_color_texture(color)
-    return "[fill:1x1:" .. minetest.colorspec_to_colorstring(color)
+    return "[fill:1x1:" .. core.colorspec_to_colorstring(color)
 end
 
 local function is_correct_item(ctx, item)
@@ -98,7 +98,7 @@ local function make_size_button(selected_size, size)
     if size == selected_size then
         -- centering won't work without the gui.Stack ¯\_(ツ)_/¯
         return gui.Stack {
-            -- prevent MineClone 2 formspec_prepend from interfering with Flow's
+            -- prevent MineClone* formspec_prepend from interfering with Flow's
             -- centering hack
             gui.StyleType {
                 selectors = { "image_button", "image_button:pressed" },
@@ -268,7 +268,7 @@ gui_change_rgb_color = flow.make_gui(function(_, ctx)
                 spacing = FORMSPEC_SPACING,
                 gui.Field {
                     name = "field_r",
-                    label = minetest.colorize("#f00", S("R (Red)")),
+                    label = core.colorize("#f00", S("R (Red)")),
                     default = not ctx.initial_setup and tostring(ctx.rgb_color.r) or nil,
                     expand = true,
                     on_event = function(player, ctx)
@@ -278,7 +278,7 @@ gui_change_rgb_color = flow.make_gui(function(_, ctx)
                 },
                 gui.Field {
                     name = "field_g",
-                    label = minetest.colorize("#0f0", S("G (Green)")),
+                    label = core.colorize("#0f0", S("G (Green)")),
                     default = not ctx.initial_setup and tostring(ctx.rgb_color.g) or nil,
                     expand = true,
                     on_event = function(player, ctx)
@@ -288,7 +288,7 @@ gui_change_rgb_color = flow.make_gui(function(_, ctx)
                 },
                 gui.Field {
                     name = "field_b",
-                    label = minetest.colorize("#00f", S("B (Blue)")),
+                    label = core.colorize("#00f", S("B (Blue)")),
                     default = not ctx.initial_setup and tostring(ctx.rgb_color.b) or nil,
                     expand = true,
                     on_event = function(player, ctx)

@@ -4,8 +4,8 @@ local is_protected_cache = {}
 local get_node_selectionboxes_cache = {}
 
 local function is_sprayable(pos)
-    local node = minetest.get_node(pos)
-    local def = minetest.registered_nodes[node.name]
+    local node = core.get_node(pos)
+    local def = core.registered_nodes[node.name]
     if def and def.drawtype == "plantlike" then
         return false
     end
@@ -19,9 +19,9 @@ local function is_protected_cached(pos, player_name)
         return result
     end
 
-    local new_result = minetest.is_protected(pos, player_name)
+    local new_result = core.is_protected(pos, player_name)
     if new_result then
-        minetest.record_protection_violation(pos, player_name)
+        core.record_protection_violation(pos, player_name)
     end
     is_protected_cache[key] = new_result
     return new_result
@@ -35,7 +35,7 @@ local function get_node_selectionboxes_cached(pos)
     end
 
     -- There is no such function :(
-    -- local new_result = minetest.get_node_selection_boxes(pos)
+    -- local new_result = core.get_node_selection_boxes(pos)
     local new_result = modlib.minetest.get_node_selectionboxes(pos)
     get_node_selectionboxes_cache[key] = new_result
     return new_result
@@ -92,7 +92,7 @@ local function calc_bitmap_size(canvas_size)
 end
 
 local function find_canvas(pos)
-    local findings = minetest.get_objects_inside_radius(pos, shared.EPSILON)
+    local findings = core.get_objects_inside_radius(pos, shared.EPSILON)
 
     for _, obj in ipairs(findings) do
         local ent = obj:get_luaentity()
@@ -103,7 +103,7 @@ local function find_canvas(pos)
 end
 
 local function create_canvas(node_pos, pos, rot, size, bitmap_size)
-    local obj = minetest.add_entity(pos, "ggraffiti:canvas")
+    local obj = core.add_entity(pos, "ggraffiti:canvas")
     if not obj then return end
     obj:set_rotation(rot)
 
@@ -120,7 +120,7 @@ end
 local spread_rect_to_node, spread_rect_to_box
 
 function shared.spraycast(player, pos, dir, def)
-    local ray = minetest.raycast(pos, pos + dir * shared.MAX_SPRAY_DISTANCE, true, false)
+    local ray = core.raycast(pos, pos + dir * shared.MAX_SPRAY_DISTANCE, true, false)
     local pthing
     for i_pthing in ray do
         if not (i_pthing.type == "object" and i_pthing.ref == player) and

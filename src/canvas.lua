@@ -47,13 +47,13 @@ function CanvasEntity:on_activate(staticdata)
     assert(type(staticdata) == "string")
 
     if staticdata ~= "" then
-        local data = minetest.deserialize(staticdata)
+        local data = core.deserialize(staticdata)
 
         if not validate_staticdata(data) then
             -- This should never happen.
             local p = self.object:get_pos():to_string()
             self.object:remove()
-            minetest.log("warning",
+            core.log("warning",
                 "Removed ggraffiti:canvas entity at " .. p .. " in on_activate because of invalid staticdata")
             return
         end
@@ -71,7 +71,7 @@ function CanvasEntity:on_activate(staticdata)
         self:update_immediately()
 
         -- "Overwrite" other canvases in the same place.
-        local rivals = minetest.get_objects_inside_radius(self.object:get_pos(), shared.EPSILON)
+        local rivals = core.get_objects_inside_radius(self.object:get_pos(), shared.EPSILON)
         for _, obj in ipairs(rivals) do
             if obj ~= self.object then
                 local ent = obj:get_luaentity()
@@ -99,8 +99,8 @@ function CanvasEntity:update_later()
 end
 
 function CanvasEntity:update_immediately()
-    local png = minetest.encode_base64(
-        minetest.encode_png(self.bitmap_size.x, self.bitmap_size.y, self.bitmap, 9)
+    local png = core.encode_base64(
+        core.encode_png(self.bitmap_size.x, self.bitmap_size.y, self.bitmap, 9)
     )
     self.object:set_properties({
         visual_size = vector.new(self.size.x, self.size.y, 0),
@@ -189,9 +189,9 @@ if shared.SELF_TEST then
         assert(count == test.bitmap_size.x * test.bitmap_size.y)
 
         for i = 1, test.bitmap_size.x * test.bitmap_size.y do
-            -- lua_api.md on minetest.colorspec_to_colorstring:
+            -- lua_api.md on core.colorspec_to_colorstring:
             -- If the ColorSpec is invalid, returns nil.
-            assert(minetest.colorspec_to_colorstring(test.bitmap[i]) ~= nil)
+            assert(core.colorspec_to_colorstring(test.bitmap[i]) ~= nil)
         end
     end
 
@@ -240,7 +240,7 @@ function CanvasEntity:is_empty()
 end
 
 function CanvasEntity:get_staticdata()
-    return minetest.serialize({
+    return core.serialize({
         node_offset = self.node_offset,
         size = self.size,
         bitmap_size = self.bitmap_size,
@@ -252,7 +252,7 @@ function CanvasEntity:get_node_pos()
     return (self.object:get_pos() + self.node_offset):round()
 end
 
-minetest.register_entity("ggraffiti:canvas", CanvasEntity)
+core.register_entity("ggraffiti:canvas", CanvasEntity)
 
 function shared.update_canvases()
     for _, canvas in ipairs(canvas_update_queue) do
@@ -266,8 +266,8 @@ end
 -- I intentionally do not remove floating graffiti in on_activate, as I think
 -- that this would only make the behavior even more inconsistent and thus even
 -- more confusing.
-minetest.register_on_dignode(function(pos)
-    local objs = minetest.get_objects_in_area(
+core.register_on_dignode(function(pos)
+    local objs = core.get_objects_in_area(
         pos - vector.new(4, 4, 4), -- arbitrary
         pos + vector.new(4, 4, 4)
     )

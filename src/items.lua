@@ -1,5 +1,5 @@
 local shared = ...
-local S = minetest.get_translator("ggraffiti")
+local S = core.get_translator("ggraffiti")
 
 local function get_eye_pos(player)
     local pos = player:get_pos()
@@ -8,7 +8,7 @@ local function get_eye_pos(player)
 end
 
 local function wear_out(player_name, item, n_steps, size)
-    if minetest.is_creative_enabled(player_name) then
+    if core.is_creative_enabled(player_name) then
         return item
     end
 
@@ -37,7 +37,7 @@ local function get_processed_spray_def(item, prompt_player)
     spray_def.size = shared.meta_get_size(meta)
 
     if spray_def.rgb then
-        spray_def.color = minetest.colorspec_to_colorstring(shared.meta_get_rgb_color(meta))
+        spray_def.color = core.colorspec_to_colorstring(shared.meta_get_rgb_color(meta))
 
         if not spray_def.color then
             if prompt_player then
@@ -72,7 +72,7 @@ local function spray_can_on_place(item, player)
     shared.gui_show_configure(player, item, meta)
 end
 
-minetest.register_craftitem("ggraffiti:spray_can_empty", { -- stackable
+core.register_craftitem("ggraffiti:spray_can_empty", { -- stackable
     description = S("Empty Spray Can"),
     inventory_image = "ggraffiti_spray_can.png",
 
@@ -89,7 +89,7 @@ end
 for _, dye in ipairs(shared.game_dyes) do
     local item_name = "ggraffiti:spray_can_" .. dye.name
 
-    minetest.register_tool(item_name, {
+    core.register_tool(item_name, {
         description = S("Graffiti Spray Can (" .. dye.desc .. ")") .. "\n" ..
             S("Left-click to spray, right-click to configure.") .. "\n\n" ..
             S("Size: @1", 1),
@@ -106,7 +106,7 @@ for _, dye in ipairs(shared.game_dyes) do
         groups = { ggraffiti_spray_can = 1 },
     })
 
-    minetest.register_craft({
+    core.register_craft({
         recipe = {
             { shared.game_items.iron_ingot },
             { dye.item_name                },
@@ -116,7 +116,7 @@ for _, dye in ipairs(shared.game_dyes) do
     })
 end
 
-minetest.register_tool("ggraffiti:spray_can_rgb", {
+core.register_tool("ggraffiti:spray_can_rgb", {
     description = S("RGB Graffiti Spray Can") .. "\n" ..
         S("Left-click to spray, right-click to configure.") .. "\n\n" ..
         S("No color set.") .. "\n" ..
@@ -134,7 +134,7 @@ minetest.register_tool("ggraffiti:spray_can_rgb", {
     groups = { ggraffiti_spray_can = 1 },
 })
 
-minetest.register_craft({
+core.register_craft({
     recipe = {
         { "",                        shared.game_items.iron_ingot, ""                         },
         { shared.game_items.red_dye, shared.game_items.green_dye,  shared.game_items.blue_dye },
@@ -143,18 +143,18 @@ minetest.register_craft({
     output = "ggraffiti:spray_can_rgb",
 })
 
-minetest.register_craftitem("ggraffiti:mushroom_red_extract", {
+core.register_craftitem("ggraffiti:mushroom_red_extract", {
     description = S("Red Mushroom Extract"),
     inventory_image = "ggraffiti_mushroom_red_extract.png",
     groups = { craftitem = shared.game == "mcl" and 1 or nil },
 })
 
-minetest.register_craft({
+core.register_craft({
     recipe = {{ shared.game_items.red_mushroom }},
     output = "ggraffiti:mushroom_red_extract " .. shared.game_items.red_mushroom_extract_count,
 })
 
-minetest.register_tool("ggraffiti:spray_can_remover", {
+core.register_tool("ggraffiti:spray_can_remover", {
     description = S("Graffiti Remover Spray Can") .. "\n" ..
         S("Left-click to spray, right-click to configure.") .. "\n\n" ..
         S("Size: @1", 1),
@@ -171,9 +171,9 @@ minetest.register_tool("ggraffiti:spray_can_remover", {
     groups = { ggraffiti_spray_can = 1 },
 })
 
-minetest.register_alias("ggraffiti:spray_can_anti", "ggraffiti:spray_can_remover")
+core.register_alias("ggraffiti:spray_can_anti", "ggraffiti:spray_can_remover")
 
-minetest.register_craft({
+core.register_craft({
     recipe = {
         { shared.game_items.iron_ingot     },
         { "ggraffiti:mushroom_red_extract" },
@@ -182,7 +182,7 @@ minetest.register_craft({
     output = "ggraffiti:spray_can_remover",
 })
 
-minetest.register_craft({
+core.register_craft({
     type = "cooking",
     recipe = "group:ggraffiti_spray_can",
     output = shared.game_items.iron_ingot .. " 2",
@@ -210,7 +210,7 @@ local function spray_step(player)
     end
 
     -- Seems to be kind of expensive.
-    if not minetest.check_player_privs(player_name, "interact") then
+    if not core.check_player_privs(player_name, "interact") then
         player_lasts[player_name] = nil
         return
     end
@@ -247,21 +247,21 @@ local dtime_accu = 0
 -- local deltas = {}
 -- local delta_index = 1
 
-minetest.register_globalstep(function(dtime)
+core.register_globalstep(function(dtime)
     dtime_accu = dtime_accu + dtime
 
     if dtime_accu >= shared.SPRAY_STEP_INTERVAL then
         -- shared.profiler_someone_spraying = false
-        -- local t1 = minetest.get_us_time()
+        -- local t1 = core.get_us_time()
 
         dtime_accu = dtime_accu % shared.SPRAY_STEP_INTERVAL
-        for _, player in ipairs(minetest.get_connected_players()) do
+        for _, player in ipairs(core.get_connected_players()) do
             spray_step(player)
         end
         shared.after_spraycasts()
 
         -- if shared.profiler_someone_spraying then
-        --     local t2 = minetest.get_us_time()
+        --     local t2 = core.get_us_time()
         --     deltas[delta_index] = (t2 - t1) / 1000
         --     delta_index = delta_index + 1
         --     if delta_index > 100000 then

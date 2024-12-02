@@ -1,10 +1,10 @@
 local shared = {}
 
-if minetest.get_modpath("default") and minetest.get_modpath("dye") and
-        minetest.get_modpath("flowers") then
+if core.get_modpath("default") and core.get_modpath("dye") and
+        core.get_modpath("flowers") then
     shared.game = "mtg"
-elseif minetest.get_modpath("mcl_core") and minetest.get_modpath("mcl_dye") and
-        minetest.get_modpath("mcl_mushrooms") then
+elseif core.get_modpath("mcl_core") and core.get_modpath("mcl_dye") and
+        core.get_modpath("mcl_mushrooms") then
     shared.game = "mcl"
 else
     error(
@@ -124,7 +124,7 @@ else
     error("Something is rotten in the state of Denmark.")
 end
 
-local basepath = minetest.get_modpath("ggraffiti") .. "/src"
+local basepath = core.get_modpath("ggraffiti") .. "/src"
 assert(loadfile(basepath .. "/aabb.lua"))(shared)
 assert(loadfile(basepath .. "/canvas.lua"))(shared)
 assert(loadfile(basepath .. "/spraycast.lua"))(shared)

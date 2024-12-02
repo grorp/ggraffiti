@@ -1,1 +1,1 @@
-dofile(minetest.get_modpath("ggraffiti") .. "/src/init.lua")
+dofile(core.get_modpath("ggraffiti") .. "/src/init.lua")

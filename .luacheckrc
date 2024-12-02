@@ -1,9 +1,9 @@
 globals = {
     "ItemStack",
+    "core",
     "dye",
     "flow",
     "math.round",
-    "minetest",
     "modlib",
     "vector",
 }
