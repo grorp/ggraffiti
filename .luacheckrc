@@ -4,6 +4,5 @@ globals = {
     "dye",
     "flow",
     "math.round",
-    "modlib",
     "vector",
 }

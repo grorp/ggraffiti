@@ -34,9 +34,7 @@ local function get_node_selectionboxes_cached(pos)
         return result
     end
 
-    -- There is no such function :(
-    -- local new_result = core.get_node_selection_boxes(pos)
-    local new_result = modlib.minetest.get_node_selectionboxes(pos)
+    local new_result = core.get_node_boxes("selection_box", pos)
     get_node_selectionboxes_cache[key] = new_result
     return new_result
 end
@@ -141,7 +139,7 @@ function shared.spraycast(player, pos, dir, def)
     if is_protected and def.size == 1 then return end
 
     local raw_box = get_node_selectionboxes_cached(pthing.under)[pthing.box_id]
-    if not raw_box then return end -- Modlib failed 😱
+    if not raw_box then return end -- We have been betrayed 😱
     local box = shared.aabb.from(raw_box)
     box:repair()
     local box_center = box:get_center()

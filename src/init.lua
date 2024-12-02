@@ -1,5 +1,16 @@
 local shared = {}
 
+if not core.get_node_boxes then
+    error(
+        '\n' ..
+        'GGraffiti\n' ..
+        "----------------------------------------------------------------------------------------------------\n" ..
+        "Luanti versions before 5.9.0 are not supported. Please update Luanti.\n" ..
+        "----------------------------------------------------------------------------------------------------\n",
+        0
+    )
+end
+
 if core.get_modpath("default") and core.get_modpath("dye") and
         core.get_modpath("flowers") then
     shared.game = "mtg"
@@ -10,12 +21,12 @@ else
     error(
         '\n' ..
         'GGraffiti\n' ..
-        "────────────────────────────────────────────────────────────────────────────────────────────────────\n" ..
+        "----------------------------------------------------------------------------------------------------\n" ..
         'No supported game found. Supported games are:\n' ..
         ' - Minetest Game\n' ..
         ' - MineClone 2\n' ..
         ' - Mineclonia\n' ..
-        "────────────────────────────────────────────────────────────────────────────────────────────────────\n",
+        "----------------------------------------------------------------------------------------------------\n",
         0
     )
 end
@@ -24,15 +35,12 @@ local function dependency_version_error(mod_title)
     error(
         '\n' ..
         'GGraffiti\n' ..
-        "────────────────────────────────────────────────────────────────────────────────────────────────────\n" ..
+        "----------------------------------------------------------------------------------------------------\n" ..
         'You have an outdated version of the mod "' .. mod_title .. '" installed. ' ..
         'Please go to "Content" → "Browse online content" and update the mod "' .. mod_title .. '".\n' ..
-        "────────────────────────────────────────────────────────────────────────────────────────────────────\n",
+        "----------------------------------------------------------------------------------------------------\n",
         0
     )
-end
-if not modlib.version or modlib.version < 102 then
-    dependency_version_error("Modding Library")
 end
 if not flow.widgets or not rawget(flow.widgets, "Nil") then
     dependency_version_error("Flow")
