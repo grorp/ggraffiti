@@ -49,6 +49,7 @@ local function update_item_meta(item, meta)
     end
 end
 
+-- TODO: replace with core.colorspec_to_table once 5.10.0 is required
 function shared.hex_color_to_table(hex)
     local r, g, b = hex:sub(2):match("(..)(..)(..)")
     return { r = tonumber(r, 16), g = tonumber(g, 16), b = tonumber(b, 16) }

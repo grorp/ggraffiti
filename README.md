@@ -2,7 +2,7 @@
 
 [![ContentDB](https://content.luanti.org/packages/grorp/ggraffiti/shields/downloads/)](https://content.luanti.org/packages/grorp/ggraffiti/)
 
-This Luanti mod adds graffiti that lets you paint whatever you want on any node you want. It requires at least engine version 5.6.0.
+This Luanti mod adds graffiti that lets you paint whatever you want on any node you want. It requires at least engine version 5.9.0.
 
 <img src="./docpics/screenshot_1.png" style="width: 512px;" />
 
@@ -35,7 +35,7 @@ If you are playing on Android: For the best spraying experience, enable `Setting
 
 ![](./docpics/recipe_rgb_spray_can_mtg.png)
 
-A spray can that can paint in any 24-bit RGB color and thus in all colors supported by Luanti. Press the place button (the right mouse button) to change the selected color.
+A spray can that can paint in any 24-bit RGB color and thus in all colors supported by Luanti. Press the place button (the right mouse button) to change the selected color. Press sneak+place while pointing at existing graffiti to pick a color ("pipette").
 
 **Red Mushroom Extract**
 
