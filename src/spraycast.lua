@@ -125,6 +125,15 @@ end
 
 local spread_rect_to_node, spread_rect_to_box
 
+-- Protection concept: Spraying respects protection, you can't spray nodes that
+-- are protected from you.
+-- Protection of each involved node is considered separately. If you spray with
+-- a 3x3 brush and the resulting rectangle is partly on a protected node, partly
+-- on an unprotected node, only the part on the unprotected node will be drawn.
+-- The behavior must be consistent regardless of which node, the protected one
+-- or the unprotected one, is the pointed/"primary" node.
+-- Only one protection violation per node position per player must be reported
+-- each server step.
 function shared.spraycast(player, pos, dir, def)
     local ray = core.raycast(pos, pos + dir * shared.MAX_SPRAY_DISTANCE, true, false)
     local pthing
@@ -332,6 +341,8 @@ function shared.after_spraycasts()
 end
 
 -- FIXME: This is 90% duplicated from shared.spraycast
+-- Protection concept: The pipette doesn't care about protection, you can
+-- use it anywhere you like.
 function shared.pipette(player, pos, dir)
     local ray = core.raycast(pos, pos + dir * shared.MAX_SPRAY_DISTANCE, true, false)
     local pthing
