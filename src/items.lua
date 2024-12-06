@@ -68,6 +68,27 @@ local function spray_can_on_use(item, player)
 end
 
 local function spray_can_on_place(item, player)
+    local spray_def = shared.get_raw_spray_def(item)
+    assert(spray_def)
+
+    if spray_def.rgb and player:get_player_control().sneak then
+        local pos = get_eye_pos(player)
+        local dir = player:get_look_dir()
+        local color_str = shared.pipette(player, pos, dir)
+
+        if color_str then
+            local color_block = core.colorize(color_str, "█")
+            local color = shared.hex_color_to_table(color_str)
+            shared.meta_set_rgb_color(item, item:get_meta(), color)
+            core.chat_send_player(player:get_player_name(), S("@1 @2, @3, @4 selected.",
+                    color_block, color.r, color.g, color.b))
+            return item
+        else
+            core.chat_send_player(player:get_player_name(), S("No color found."))
+            return
+        end
+    end
+
     local meta = item:get_meta()
     shared.gui_show_configure(player, item, meta)
 end
@@ -118,7 +139,8 @@ end
 
 core.register_tool("ggraffiti:spray_can_rgb", {
     description = S("RGB Graffiti Spray Can") .. "\n" ..
-        S("Left-click to spray, right-click to configure.") .. "\n\n" ..
+        S("Left-click to spray, right-click to configure.") .. "\n" ..
+        S("Sneak + right-click for pipette.") .. "\n\n" ..
         S("No color set.") .. "\n" ..
         S("Size: @1", 1),
     inventory_image = "ggraffiti_spray_can_rgb.png",

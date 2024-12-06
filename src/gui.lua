@@ -33,7 +33,8 @@ local function update_item_meta(item, meta)
 
         meta:set_string("description",
             item:get_short_description() .. "\n" ..
-            S("Left-click to spray, right-click to configure.") .. "\n\n" ..
+            S("Left-click to spray, right-click to configure.") .. "\n" ..
+            S("Sneak + right-click for pipette.") .. "\n\n" ..
             S("Color: @1 @2, @3, @4", color_block, color.r, color.g, color.b) .. "\n" ..
             S("Size: @1", size)
         )
@@ -48,11 +49,16 @@ local function update_item_meta(item, meta)
     end
 end
 
+function shared.hex_color_to_table(hex)
+    local r, g, b = hex:sub(2):match("(..)(..)(..)")
+    return { r = tonumber(r, 16), g = tonumber(g, 16), b = tonumber(b, 16) }
+end
+
 local function meta_set_size(item, meta, size)
     meta:set_string("ggraffiti_size", tostring(size))
     update_item_meta(item, meta)
 end
-local function meta_set_rgb_color(item, meta, color)
+function shared.meta_set_rgb_color(item, meta, color)
     meta:set_string("ggraffiti_rgb_color", core.serialize(color))
     update_item_meta(item, meta)
 end
@@ -62,9 +68,7 @@ local gui_change_rgb_color
 
 local function get_color(item_name)
     local hex = core.registered_items[item_name]._ggraffiti_spray_can.color
-    if not hex then return end
-    local r, g, b = hex:sub(2):match("(..)(..)(..)")
-    return { r = tonumber(r, 16), g = tonumber(g, 16), b = tonumber(b, 16) }
+    return hex and shared.hex_color_to_table(hex) or nil
 end
 
 local function make_color_texture(color)
@@ -228,7 +232,7 @@ local function save_button_on_event(player, ctx)
             b = tonumber(ctx.form.field_b),
         }
         local meta = item:get_meta()
-        meta_set_rgb_color(item, meta, rgb_color)
+        shared.meta_set_rgb_color(item, meta, rgb_color)
         player:set_wielded_item(item)
 
         gui_configure:show(player, {

@@ -28,6 +28,7 @@ Red Mushroom Extract=
 Graffiti Remover Spray Can=
 
 Left-click to spray, right-click to configure.=
+Sneak + right-click for pipette.=
 No color set.=
 Color: @1 @2, @3, @4=
 Size: @1=
@@ -48,3 +49,6 @@ Preview=
 Update=
 Cancel=
 Save=
+
+No color found.=
+@1 @2, @3, @4 selected.=

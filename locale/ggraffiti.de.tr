@@ -28,6 +28,7 @@ Red Mushroom Extract=Roter Pilzextrakt
 Graffiti Remover Spray Can=Graffiti-Entferner-Sprühdose
 
 Left-click to spray, right-click to configure.=Linksklick zum Sprühen, Rechtsklick zum Konfigurieren.
+Sneak + right-click for pipette.=Schleichen + Rechtsklick für Pipette.
 No color set.=Keine Farbe festgelegt.
 Color: @1 @2, @3, @4=Farbe: @1 @2, @3, @4
 Size: @1=Größe: @1
@@ -48,3 +49,6 @@ Preview=Vorschau
 Update=Aktualisieren
 Cancel=Abbrechen
 Save=Speichern
+
+No color found.=Keine Farbe gefunden.
+@1 @2, @3, @4 selected.=@1 @2, @3, @4 ausgewählt.

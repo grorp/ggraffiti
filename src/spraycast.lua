@@ -330,3 +330,63 @@ function shared.after_spraycasts()
     is_protected_cache = {}
     get_node_selectionboxes_cache = {}
 end
+
+-- FIXME: This is 90% duplicated from shared.spraycast
+function shared.pipette(player, pos, dir)
+    local ray = core.raycast(pos, pos + dir * shared.MAX_SPRAY_DISTANCE, true, false)
+    local pthing
+    for i_pthing in ray do
+        if not (i_pthing.type == "object" and i_pthing.ref == player) and
+                not (i_pthing.type == "node" and not is_sprayable(i_pthing.under)) then
+            pthing = i_pthing
+            break
+        end
+    end
+    if not pthing or pthing.type ~= "node" or
+            -- `pthing.intersection_normal == vector.zero()` if you're inside a node
+            pthing.intersection_normal == vector.zero() then
+        return
+    end
+
+    local node_pos = pthing.under
+
+    local raw_box = get_node_selectionboxes_cached(pthing.under)[pthing.box_id]
+    -- We're not in a spraycast loop, there will be no shared.after_spraycasts(),
+    -- so we do this manually
+    get_node_selectionboxes_cache = {}
+    if not raw_box then return end -- We have been betrayed 😱
+    local box = shared.aabb.from(raw_box)
+    box:repair()
+    local box_center = box:get_center()
+
+    local canvas_rot = vector.dir_to_rotation(pthing.intersection_normal)
+    local canvas_prerot = vector_prerot_pre(canvas_rot)
+    local rot_box = shared.aabb.new(
+        vector_prerot(box.pos_min, canvas_prerot),
+        vector_prerot(box.pos_max, canvas_prerot)
+    )
+    rot_box:repair()
+    local rot_box_size = rot_box:get_size()
+    local bitmap_size = calc_bitmap_size(rot_box_size)
+
+    local canvas_pos = node_pos + box_center +
+        vector_prerot(vector.new(0, 0, rot_box_size.z * shared.CANVAS_OFFSET), canvas_prerot)
+    local canvas = find_canvas(canvas_pos)
+    if not canvas then
+        return nil
+    end
+
+    local root_pos = node_pos + box_center +
+        vector_prerot(vector.new(0, 0, rot_box_size.z * 0.5), canvas_prerot)
+    local pointed_pos = pthing.intersection_point
+
+    -- 2D (Z is always zero)
+    local pos_on_canvas = vector.new(rot_box_size.x / 2, rot_box_size.y / 2, 0) +
+        vec_to_canvas_space(pointed_pos - root_pos, canvas_prerot)
+
+    local pos_on_bitmap_x = pos_on_canvas.x / rot_box_size.x * bitmap_size.x
+    local pos_on_bitmap_y = pos_on_canvas.y / rot_box_size.y * bitmap_size.y
+
+    local color = canvas:get_pixel(math.floor(pos_on_bitmap_x), math.floor(pos_on_bitmap_y))
+    return color ~= shared.TRANSPARENT and color or nil
+end
