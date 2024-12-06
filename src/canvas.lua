@@ -116,14 +116,25 @@ local function clamp(val, min, max)
     return math.min(math.max(val, min), max)
 end
 
--- x and y are 0-based.
+-- "x" and "y" parameters are always 0-based in the functions below.
+
+-- "out-of-bounds on bitmap" doesn't always also mean "out-of-bounds in list",
+-- so there's a separate way to check.
+function CanvasEntity:pos_in_bounds(x, y)
+    return x >= 0 and x <= self.bitmap_size.x - 1 and
+        y >= 0 and y <= self.bitmap_size.y - 1
+end
+
+function CanvasEntity:pos_get_index(x, y)
+    return y * self.bitmap_size.x + x + 1
+end
+
 -- If the pixel is outside the canvas area, nothing will be drawn.
 function CanvasEntity:draw_pixel(x, y, color, remover)
-    if x < 0 or x > self.bitmap_size.x - 1 or
-            y < 0 or y > self.bitmap_size.y - 1 then
+    if not self:pos_in_bounds(x, y) then
         return
     end
-    local index = y * self.bitmap_size.x + x + 1
+    local index = self:pos_get_index(x, y)
 
     if self.bitmap[index] ~= color then
         self.bitmap[index] = color
@@ -136,10 +147,17 @@ function CanvasEntity:draw_pixel(x, y, color, remover)
     end
 end
 
--- x and y are 0-based.
+-- If the pixel is outside the canvas area, nil is returned.
+function CanvasEntity:get_pixel(x, y)
+    if not self:pos_in_bounds(x, y) then
+        return nil
+    end
+    return self.bitmap[self:pos_get_index(x, y)]
+end
+
 -- To get correct results, at least one pixel of the rectangle must be inside
 -- the canvas area. If this requirement is not fulfilled, the result will be
--- incorrect, but the canvas data will not become invalid.
+-- incorrect (but there will be no errors / data invalidation).
 function CanvasEntity:draw_rect(x, y, size, color, remover)
     assert(size >= 1)
 
@@ -152,9 +170,10 @@ function CanvasEntity:draw_rect(x, y, size, color, remover)
         clamp(x + size - 1, 0, max_x),
         clamp(y + size - 1, 0, max_y)
 
+    -- TODO: make this more fancy using stride stuff (get rid of pos_get_index)
     for yy = y1, y2 do
         for xx = x1, x2 do
-            self.bitmap[yy * self.bitmap_size.x + xx + 1] = color
+            self.bitmap[self:pos_get_index(xx, yy)] = color
         end
     end
 
