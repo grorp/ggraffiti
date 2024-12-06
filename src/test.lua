@@ -8,6 +8,8 @@ local function test_canvas(test_fn)
         bitmap = {},
         update_later = function() end,
     }
+    -- __index is already set by core.register_entity
+    setmetatable(test, CanvasEntity)
     for i = 1, test.bitmap_size.x * test.bitmap_size.y do
         test.bitmap[i] = "#ff0000"
     end
