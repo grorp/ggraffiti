@@ -1,0 +1,54 @@
+# textdomain: ggraffiti
+
+Empty Spray Can=Пустой баллончик
+
+Graffiti Spray Can (White)=Спрей для граффити (белый)
+Graffiti Spray Can (Grey)=Спрей для граффити (серый)
+Graffiti Spray Can (Dark Grey)=Спрей для граффити (темно-серый)
+Graffiti Spray Can (Black)=Спрей для граффити (черный)
+Graffiti Spray Can (Violet)=Спрей для граффити (фиолетовый)
+Graffiti Spray Can (Blue)=Спрей для граффити (синий)
+Graffiti Spray Can (Cyan)=Спрей для граффити (голубой)
+Graffiti Spray Can (Dark Green)=Спрей для граффити (темно-зеленый)
+Graffiti Spray Can (Green)=Спрей для граффити (зеленый)
+Graffiti Spray Can (Yellow)=Спрей для граффити (желтый)
+Graffiti Spray Can (Brown)=Спрей для граффити (коричневый)
+Graffiti Spray Can (Orange)=Спрей для граффити (оранжевый)
+Graffiti Spray Can (Red)=Спрей для граффити (красный)
+Graffiti Spray Can (Magenta)=Спрей для граффити (пурпурный)
+Graffiti Spray Can (Pink)=Спрей для граффити (розовый)
+
+Graffiti Spray Can (Light Grey)=Спрей для граффити (светло-серый)
+Graffiti Spray Can (Purple)=Спрей для граффити (лиловый)
+Graffiti Spray Can (Light Blue)=Спрей для граффити (светло-синий)
+Graffiti Spray Can (Lime)=Спрей для граффити (лаймовый)
+
+RGB Graffiti Spray Can=Спрей для граффити (RGB)
+Red Mushroom Extract=Экстракт красного гриба
+Graffiti Remover Spray Can=Спрей для удаления граффити
+
+Left-click to spray, right-click to configure.=ЛКМ: брызнуть; ПКМ: конфигурация
+Sneak + right-click for pipette.=Присесть + ПКМ: пипетка
+No color set.=Не установлен цвет.
+Color: @1 @2, @3, @4=Цвет: @1 @2, @3, @4
+Size: @1=Размер: @1
+
+Set Color=Уст. цвет
+Change Color=Изм. цвет
+
+Color=Цвет
+R: @1, G: @2, B: @3=
+Size=Размер
+Change=Изм.
+
+R (Red)=R (Красный)
+G (Green)=G (Зеленый)
+B (Blue)=B (Синий)
+Values must be integers between 0 and 255.=Значения должны быть в пределах 0-255.
+Preview=Просмотр
+Update=Обновить
+Cancel=Отмена
+Save=Сохранить
+
+No color found.=Цвет не найден.
+@1 @2, @3, @4 selected.=@1 @2, @3, @4 выбраны.
