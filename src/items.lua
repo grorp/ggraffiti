@@ -62,7 +62,7 @@ local function spray_can_on_use(item, player)
     if not spray_def then return end
 
     local pos = get_eye_pos(player)
-    local dir = player:get_look_dir()
+    local dir = player:get_point_dir()
     shared.spraycast(player, pos, dir, spray_def)
     player_lasts[player_name] = { pos = pos, dir = dir }
     shared.after_spraycasts()
@@ -76,7 +76,7 @@ local function spray_can_on_place(item, player)
 
     if spray_def.rgb and player:get_player_control().sneak then
         local pos = get_eye_pos(player)
-        local dir = player:get_look_dir()
+        local dir = player:get_point_dir()
         local color_str = shared.pipette(player, pos, dir)
 
         if color_str then
@@ -246,7 +246,7 @@ local function spray_step(player)
 
     local last = player_lasts[player_name]
     local now_pos = get_eye_pos(player)
-    local now_dir = player:get_look_dir()
+    local now_dir = player:get_point_dir()
 
     if last then
         local n_steps = shared.NUM_SPRAY_STEPS
