@@ -4,6 +4,9 @@ local S = core.get_translator("ggraffiti")
 local function get_eye_pos(player)
     local pos = player:get_pos()
     pos.y = pos.y + player:get_properties().eye_height
+    -- https://dev.luanti.org/docs/classes/raycast/#redo-tool-raycasts
+    local first_person = player:get_eye_offset()
+    pos = pos + first_person/10
     return pos
 end
 
